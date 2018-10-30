@@ -2,50 +2,50 @@
 Imports System.Data.SqlClient
 Imports OfficeOpenXml
 Partial Class ProductivityReport
-	Inherits System.Web.UI.Page
-	Private Function GetDiskFileName(ByVal mStr As String) As String
-		mStr = mStr.Replace("/", "_")
-		mStr = mStr.Replace("\", "_")
-		mStr = mStr.Replace(":", "_")
-		mStr = mStr.Replace("*", "_")
-		mStr = mStr.Replace("?", "_")
-		mStr = mStr.Replace("""", "_")
-		mStr = mStr.Replace(">", "_")
-		mStr = mStr.Replace("<", "_")
-		mStr = mStr.Replace("|", "_")
-		mStr = mStr.Trim
-		Return mStr
-	End Function
-	Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-		'================
-		Dim mLastScriptTimeout As Integer = HttpContext.Current.Server.ScriptTimeout
-		HttpContext.Current.Server.ScriptTimeout = 1200
-		'================
+  Inherits System.Web.UI.Page
+  Private Function GetDiskFileName(ByVal mStr As String) As String
+    mStr = mStr.Replace("/", "_")
+    mStr = mStr.Replace("\", "_")
+    mStr = mStr.Replace(":", "_")
+    mStr = mStr.Replace("*", "_")
+    mStr = mStr.Replace("?", "_")
+    mStr = mStr.Replace("""", "_")
+    mStr = mStr.Replace(">", "_")
+    mStr = mStr.Replace("<", "_")
+    mStr = mStr.Replace("|", "_")
+    mStr = mStr.Trim
+    Return mStr
+  End Function
+  Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+    '================
+    Dim mLastScriptTimeout As Integer = HttpContext.Current.Server.ScriptTimeout
+    HttpContext.Current.Server.ScriptTimeout = 1200
+    '================
 
-		Dim FromDate As String = ""
-		Dim ToDate As String = ""
-		Dim Division As String = ""
-		Try
-			FromDate = Request.QueryString("fd")
-			ToDate = Request.QueryString("td")
-			Division = Request.QueryString("typ")
-		Catch ex As Exception
-			FromDate = ""
-			ToDate = ""
-			Division = ""
-		End Try
-		If FromDate = String.Empty Then Return
-		Dim DWFile As String = Division & "_" & Convert.ToDateTime(FromDate).Month.ToString & "_" & Convert.ToDateTime(FromDate).Year.ToString
-		Dim FilePath As String = CreateFile(FromDate, ToDate, Division)
-		'================
-		HttpContext.Current.Server.ScriptTimeout = mLastScriptTimeout
-		'===============
-		Response.ClearContent()
-    Response.AppendHeader("content-disposition", "attachment; filename=" & DWFile & ".xlsx")
+    Dim FromDate As String = ""
+    Dim ToDate As String = ""
+    Dim Division As String = ""
+    Try
+      FromDate = Request.QueryString("fd")
+      ToDate = Request.QueryString("td")
+      Division = Request.QueryString("typ")
+    Catch ex As Exception
+      FromDate = ""
+      ToDate = ""
+      Division = ""
+    End Try
+    If FromDate = String.Empty Then Return
+    Dim DWFile As String = Division & "_" & Convert.ToDateTime(FromDate).Month.ToString & "_" & Convert.ToDateTime(FromDate).Year.ToString
+    Dim FilePath As String = CreateFile(FromDate, ToDate, Division)
+    '================
+    HttpContext.Current.Server.ScriptTimeout = mLastScriptTimeout
+    '===============
+    Response.ClearContent()
+    Response.AppendHeader("content-disposition", "attachment; filename=" & DWFile & ".xlsx" & """")
     Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(IO.Path.GetFileName(FilePath))
-		Response.WriteFile(FilePath)
-		Response.End()
-	End Sub
+    Response.WriteFile(FilePath)
+    Response.End()
+  End Sub
   Private Function CreateFile(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As String
     Dim FileName As String = Server.MapPath("~/..") & "App_Temp\" & Guid.NewGuid().ToString()
     IO.File.Copy(Server.MapPath("~/App_Templates") & "\ProductivityReportTemplate.xlsx", FileName)
@@ -136,6 +136,26 @@ Partial Class ProductivityReport
         If doc.DesignGroup = "ENGG009" Then
           .Cells(r, c).Value = "CFBC-Thermal and Process"
         End If
+        If doc.DesignGroup = "ENGG011" Then
+          .Cells(r, c).Value = "EPC-Engineering_Mechanical"
+        End If
+
+        If doc.DesignGroup = "ENGG012" Then
+          .Cells(r, c).Value = "EPC-Engineering_Electrical"
+        End If
+
+        If doc.DesignGroup = "ENGG013" Then
+          .Cells(r, c).Value = "EPC-Engineering_Piping"
+        End If
+
+        If doc.DesignGroup = "ENGG014" Then
+          .Cells(r, c).Value = "EPC-Engineering_C&I"
+        End If
+
+        If doc.DesignGroup = "ENGG015" Then
+          .Cells(r, c).Value = "EPC-Engineering_Civil/Structure"
+        End If
+
         If doc.DesignGroup = "ENGGA" Then
           .Cells(r, c).Value = "TG AND DG GROUP"
         End If
@@ -175,8 +195,6 @@ Partial Class ProductivityReport
         If doc.DesignGroup = "ENGGM" Then
           .Cells(r, c).Value = "EPC CHENNAI DESIGN CENTRE"
         End If
-
-
 
         'c += 1
         '.Cells(r, c).Value = "=1+1"
@@ -280,9 +298,6 @@ Partial Class ProductivityReport
 
     Return FileName
   End Function
-
-
-
 End Class
 Public Class ProductivityReportClass
   Public ProjectID As String = ""
@@ -338,7 +353,7 @@ Public Class ProductivityReportClass
       Case "EPC"
         VaultDB = "EPC"
         FilterActivity = "(1,2)"
-        FilterGroup = "('ENGGM')"
+        FilterGroup = "('ENGGM','ENGG011','ENGG012','ENGG013','ENGG014','ENGG015')"
       Case "APC"
         VaultDB = "PC"
         FilterActivity = "(1,2,75,77)"
@@ -423,7 +438,7 @@ Public Class ProductivityReportClass
       Case "EPC"
         VaultDB = "EPC"
         FilterActivity = "(1,2)"
-        FilterGroup = "('ENGGM')"
+        FilterGroup = "('ENGGM','ENGG011','ENGG012','ENGG013','ENGG014','ENGG015')"
       Case "APC"
         VaultDB = "PC"
         FilterActivity = "(1,2,75,77)"
@@ -465,7 +480,6 @@ Public Class ProductivityReportClass
       Using Cmd As SqlCommand = Con.CreateCommand()
         Cmd.CommandType = CommandType.Text
         Cmd.CommandText = Sql
-        Cmd.CommandTimeout = 3600
         Results = New List(Of ProductivityReportClass)
         Con.Open()
         Dim Reader As SqlDataReader = Cmd.ExecuteReader()
@@ -502,7 +516,7 @@ Public Class ProductivityReportClass
       Case "EPC"
         VaultDB = "EPC"
         FilterActivity = "(1,2,10,19,57,61,76)"
-        FilterGroup = "('ENGGM')"
+        FilterGroup = "('ENGGM','ENGG011','ENGG012','ENGG013','ENGG014','ENGG015')"
       Case "APC"
         VaultDB = "PC"
         FilterActivity = "(1,2,75,77,10,19,57,61,76)"
@@ -619,7 +633,7 @@ Public Class ProductivityReportClass
       Case "EPC"
         VaultDB = "EPC"
         FilterActivity = "(1,2)"
-        FilterGroup = "('ENGGM')"
+        FilterGroup = "('ENGGM','ENGG011','ENGG012','ENGG013','ENGG014','ENGG015')"
       Case "APC"
         VaultDB = "PC"
         FilterActivity = "(1,2,75,77)"
