@@ -19,7 +19,7 @@ Partial Class ProductivityReport
   Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
     '================
     Dim mLastScriptTimeout As Integer = HttpContext.Current.Server.ScriptTimeout
-    HttpContext.Current.Server.ScriptTimeout = 1200
+    HttpContext.Current.Server.ScriptTimeout = Integer.MaxValue
     '================
 
     Dim FromDate As String = ""
@@ -41,7 +41,7 @@ Partial Class ProductivityReport
     HttpContext.Current.Server.ScriptTimeout = mLastScriptTimeout
     '===============
     Response.ClearContent()
-    Response.AppendHeader("content-disposition", "attachment; filename=" & DWFile & ".xlsx" & """")
+    Response.AppendHeader("content-disposition", "attachment; filename=" & DWFile & ".xlsx")
     Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(IO.Path.GetFileName(FilePath))
     Response.WriteFile(FilePath)
     Response.End()
@@ -54,7 +54,17 @@ Partial Class ProductivityReport
     Dim xlWS As ExcelWorksheet = xlPk.Workbook.Worksheets("Report")
 
 
-    Dim oDocs As List(Of ProductivityReportClass) = ProductivityReportClass.GetNewProductivityReport(FromDate, ToDate, Division)
+    Dim oDocs As List(Of ProductivityReportClass) = Nothing
+    If Division = "BOILER" Then
+      If Convert.ToDateTime(FromDate).Year < 2019 Then
+        oDocs = ProductivityReportClass.GetNewProductivityReport(FromDate, ToDate, Division)
+      Else
+        'Issue Slip Data Not Considered only Transmittals
+        oDocs = ProductivityReportClass.GetBoilerProductivityReport(FromDate, ToDate, Division)
+      End If
+    Else
+      oDocs = ProductivityReportClass.GetNewProductivityReport(FromDate, ToDate, Division)
+    End If
     'Calculate Produnctivity
     Dim Productivity As Double = 0.0
     Dim TotHrs As Double = 0
@@ -208,7 +218,16 @@ Partial Class ProductivityReport
 
     'Not Included in Productivity Report
     xlWS = xlPk.Workbook.Worksheets("NOT ISSUED")
-    oDocs = ProductivityReportClass.GetDocumentNotIssued(FromDate, ToDate, Division)
+    If Division = "BOILER" Then
+      If Convert.ToDateTime(FromDate).Year < 2019 Then
+        oDocs = ProductivityReportClass.GetDocumentNotIssued(FromDate, ToDate, Division)
+      Else
+        oDocs = ProductivityReportClass.GetBoilerDocumentNotIssued(FromDate, ToDate, Division)
+      End If
+    Else
+      oDocs = ProductivityReportClass.GetDocumentNotIssued(FromDate, ToDate, Division)
+    End If
+
     r = 5
     With xlWS
       For Each doc As ProductivityReportClass In oDocs
@@ -233,7 +252,15 @@ Partial Class ProductivityReport
       Next
     End With
     xlWS = xlPk.Workbook.Worksheets("NO HRS ENTRY")
-    oDocs = ProductivityReportClass.GetDocumentNoHrsEntry(FromDate, ToDate, Division)
+    If Division = "BOILER" Then
+      If Convert.ToDateTime(FromDate).Year < 2019 Then
+        oDocs = ProductivityReportClass.GetDocumentNoHrsEntry(FromDate, ToDate, Division)
+      Else
+        oDocs = ProductivityReportClass.GetBoilerDocumentIssuedButNoHRSEntry(FromDate, ToDate, Division)
+      End If
+    Else
+      oDocs = ProductivityReportClass.GetDocumentNoHrsEntry(FromDate, ToDate, Division)
+    End If
     r = 5
     With xlWS
       For Each doc As ProductivityReportClass In oDocs
@@ -414,6 +441,85 @@ Public Class ProductivityReportClass
   End Function
 
   'NOT ISSUED
+  Public Shared Function GetBoilerDocumentNotIssued(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As List(Of ProductivityReportClass)
+    'Convert From & TO Date yyyy-mm-dd
+    ToDate = Convert.ToDateTime(ToDate).AddDays(1)
+    FromDate = FromDate.Substring(6, 4) & "-" & FromDate.Substring(3, 2) & "-" & FromDate.Substring(0, 2)
+    ToDate = ToDate.Substring(6, 4) & "-" & ToDate.Substring(3, 2) & "-" & ToDate.Substring(0, 2)
+    Dim FilterActivity As String = "(1,2,75,77)"
+    Dim FilterGroup As String = "('ENGG001','ENGGC','ENGGD','ENGGF','ENGG005','ENGG002','ENGG003','ENGG004')"
+    Dim VaultDB As String = "BOILER"
+    Select Case Division
+      Case "PUNE"
+        FilterActivity = "(1,2)"
+        FilterGroup = "('PUNE001')"
+        VaultDB = "SMD"
+      Case "SMD"
+        FilterActivity = "(1,2)"
+        FilterGroup = "('ENGGI')"
+        VaultDB = "SMD"
+      Case "CHENNAI"
+        FilterActivity = "(1,2,75,77)"
+        FilterGroup = "('ENGG005')"
+        VaultDB = "BOILER"
+      Case "EPC"
+        VaultDB = "EPC"
+        FilterActivity = "(1,2)"
+        FilterGroup = "('ENGGM','ENGG011','ENGG012','ENGG013','ENGG014','ENGG015')"
+      Case "APC"
+        VaultDB = "PC"
+        FilterActivity = "(1,2,75,77)"
+        FilterGroup = "('ENGG007')"
+      Case "BOILER"
+        FilterActivity = "(1,2,75,77,10,19,57,61,76)"
+        FilterGroup = "('ENGG001','ENGGA','ENGGB','ENGGC','ENGGD','ENGGE','ENGGF','ENGGG','ENGGH','ENGG005','ENGG002','ENGG003','ENGG004','ENGG005','ENGG006','ENGG007','ENGG008','ENGG009')"
+        VaultDB = "BOILER"
+    End Select
+    Dim Sql As String = ""
+    Sql &= "select dm.t_cprj as ProjectID,"
+    Sql &= "       dm.t_docn as DocumentID,"
+    Sql &= "       dm.t_revn as Revision,"
+    Sql &= "       dm.t_adat as IssueDate,"
+
+    Sql &= "(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=dm.t_docn and t_revn=dm.t_revn) as Discipline,"
+
+    Sql &= "(select top 1 ltrim(t_oscd) from tdmisg140200 where t_docn=dm.t_docn and t_revn=dm.t_revn) as Outsourced"
+
+
+    Sql &= "  from tdmisg001200 as dm"
+    Sql &= "  where ((dm.t_adat >= '" & FromDate & "') AND (dm.t_adat < '" & ToDate & "'))"
+    Sql &= "    and dm.t_revn = '00' "
+    Sql &= "    and substring(dm.t_docn,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
+    Sql &= "    and upper(dm.t_name) = '" & VaultDB & "' "
+    Sql &= "    and dm.t_docn+dm.t_revn not in "
+    Sql &= "       ( "
+    'Sql &= "        select isu.t_docn+isu.t_revi from tdmisg011200 as isu "
+    'Sql &= "        where (isu.t_isdt >= '" & FromDate & "') AND (isu.t_isdt < '" & ToDate & "')"
+    'Sql &= "	      Union All "
+    Sql &= "	      select "
+    Sql &= "	      tl.t_docn+tl.t_revn  "
+    Sql &= "	      from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran "
+    Sql &= "        where (th.t_isdt >= '" & FromDate & "') AND (th.t_isdt < '" & ToDate & "')"
+    Sql &= "        )"
+    Sql &= "  order by dm.t_cprj,dm.t_docn,dm.t_adat"
+
+    Dim Results As List(Of ProductivityReportClass) = Nothing
+    Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString() & ";Connection Timeout=2400")
+      Using Cmd As SqlCommand = Con.CreateCommand()
+        Cmd.CommandTimeout = 2400
+        Cmd.CommandType = CommandType.Text
+        Cmd.CommandText = Sql
+        Results = New List(Of ProductivityReportClass)
+        Con.Open()
+        Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+        While (Reader.Read())
+          Results.Add(New ProductivityReportClass(Reader))
+        End While
+        Reader.Close()
+      End Using
+    End Using
+    Return Results
+  End Function
   Public Shared Function GetDocumentNotIssued(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As List(Of ProductivityReportClass)
     'Convert From & TO Date yyyy-mm-dd
     ToDate = Convert.ToDateTime(ToDate).AddDays(1)
@@ -476,8 +582,9 @@ Public Class ProductivityReportClass
     Sql &= "  order by dm.t_cprj,dm.t_docn,dm.t_adat"
 
     Dim Results As List(Of ProductivityReportClass) = Nothing
-    Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+    Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString() & ";Connection Timeout=2400")
       Using Cmd As SqlCommand = Con.CreateCommand()
+        Cmd.CommandTimeout = 2400
         Cmd.CommandType = CommandType.Text
         Cmd.CommandText = Sql
         Results = New List(Of ProductivityReportClass)
@@ -492,6 +599,113 @@ Public Class ProductivityReportClass
     Return Results
   End Function
   'Report
+  Public Shared Function GetBoilerProductivityReport(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As List(Of ProductivityReportClass)
+    'Convert From & TO Date yyyy-mm-dd
+    ToDate = Convert.ToDateTime(ToDate).AddDays(1)
+    FromDate = FromDate.Substring(6, 4) & "-" & FromDate.Substring(3, 2) & "-" & FromDate.Substring(0, 2)
+    ToDate = ToDate.Substring(6, 4) & "-" & ToDate.Substring(3, 2) & "-" & ToDate.Substring(0, 2)
+    Dim FilterActivity As String = "(1,2,75,77,10,19,57,61,76)"
+    Dim FilterGroup As String = "('ENGG001','ENGGC','ENGGD','ENGGF','ENGG005','ENGG002','ENGG003','ENGG004')"
+    Dim VaultDB As String = "BOILER"
+    Select Case Division
+      Case "PUNE"
+        FilterActivity = "(1,2,10,19,57,61,76)"
+        FilterGroup = "('PUNE001')"
+        VaultDB = "SMD"
+      Case "SMD"
+        FilterActivity = "(1,2,10,19,57,61,76)"
+        FilterGroup = "('ENGGI')"
+        VaultDB = "SMD"
+      Case "CHENNAI"
+        FilterActivity = "(1,2,75,77,10,19,57,61,76)"
+        FilterGroup = "('ENGG005')"
+        VaultDB = "BOILER"
+      Case "EPC"
+        VaultDB = "EPC"
+        FilterActivity = "(1,2,10,19,57,61,76)"
+        FilterGroup = "('ENGGM','ENGG011','ENGG012','ENGG013','ENGG014','ENGG015')"
+      Case "APC"
+        VaultDB = "PC"
+        FilterActivity = "(1,2,75,77,10,19,57,61,76)"
+        FilterGroup = "('ENGG007')"
+      Case "BOILER"
+        FilterActivity = "(1,2,75,77,10,19,57,61,76)"
+        FilterGroup = "('ENGG001','ENGGA','ENGGB','ENGGC','ENGGD','ENGGE','ENGGF','ENGGG','ENGGH','ENGG005','ENGG002','ENGG003','ENGG004','ENGG005','ENGG006','ENGG007','ENGG008','ENGG009')"
+        VaultDB = "BOILER"
+    End Select
+    Dim Sql As String = ""
+    Sql = Sql & " select "
+    Sql = Sql & "	aa.DocumentID, "
+    Sql = Sql & "	aa.IssueDate, "
+    Sql = Sql & "	aa.Revision, "
+    Sql = Sql & "	aa.SheetSize, "
+    Sql = Sql & "	(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Discipline, "
+    Sql = Sql & "	(select top 1 isnull(t_oscd,2) from tdmisg140200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Outsourced, "
+    Sql = Sql & " (select top 1 ltrim(t_size) from tdmisg001200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as dmSize, "
+    Sql = Sql & "    (select sum(hh.t_hhrs)    "
+    Sql = Sql & "       from ttiisg910200 hh "
+    Sql = Sql & "       where hh.t_acid in " & FilterActivity
+    Sql = Sql & "		      and aa.DocumentID = hh.t_cdoc "
+    Sql = Sql & "         and cast(hh.t_tdat as date)<=cast(dateadd(d,2,aa.IssueDate) as date)  "
+    Sql = Sql & "         and hh.t_grcd in " & FilterGroup
+    Sql = Sql & "         ) as Hours, "
+    Sql = Sql & "        (select top 1 hh.t_grcd    "
+    Sql = Sql & "            from ttiisg910200 hh "
+    Sql = Sql & "		         where aa.DocumentID = hh.t_cdoc "
+    Sql = Sql & "              and hh.t_acid in " & FilterActivity
+    Sql = Sql & "              and hh.t_grcd in " & FilterGroup
+    Sql = Sql & "        ) as GroupID,"
+    Sql = Sql & "        aa.DocumentID as IssDoc "
+    Sql = Sql & "	From ( "
+    'Sql = Sql & "		select "
+    'Sql = Sql & "			iss.t_docn as DocumentID, "
+    'Sql = Sql & "			iss.t_isdt as IssueDate, "
+    'Sql = Sql & "			iss.t_revi as Revision, "
+    'Sql = Sql & "			iss.t_shsz as SheetSize "
+    'Sql = Sql & "	  from tdmisg011200 as iss  "
+    'Sql = Sql & "	  where iss.t_isdt >= '" & FromDate & "'"
+    'Sql = Sql & "	  Union All "
+    Sql = Sql & "	  select "
+    Sql = Sql & "	    tl.t_docn as DocumentID, "
+    Sql = Sql & "	    th.t_isdt as IssueDate, "
+    Sql = Sql & "	    tl.t_revn as Revision, "
+    Sql = Sql & "		  (select dl.t_size from tdmisg121200 as dl where dl.t_docn=tl.t_docn and dl.t_revn=tl.t_revn) as SheetSize "
+    Sql = Sql & "	  from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran "
+    Sql = Sql & "	  where th.t_isdt >= '" & FromDate & "'"
+    Sql = Sql & "   and substring(tl.t_docn,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
+    Sql = Sql & "	) as aa  "
+    Sql = Sql & " where substring(aa.DocumentID,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
+    Sql = Sql & " and   substring(aa.DocumentID,1,20)+ substring('0000'+ltrim(substring(aa.DocumentID,21,4)) ,len('0000'+ltrim(substring(aa.DocumentID,21,4)))-3,4)   "
+    Sql = Sql & "      in (select ltrim(hh.t_cprj)+'-'+ltrim(hh.t_cspa)+'-'+ltrim(hh.t_dcat)+'-'+substring('0000'+ltrim(hh.t_dsno),len('0000'+ltrim(hh.t_dsno))-3 ,4)    "
+    Sql = Sql & "                    from ttiisg910200 hh "
+    Sql = Sql & "                    where hh.t_acid in " & FilterActivity
+    Sql = Sql & "                      and cast(hh.t_tdat as date)<=cast(dateadd(d,2,aa.IssueDate) as date)  "
+    Sql = Sql & "                      and hh.t_grcd in " & FilterGroup & ") "
+    Sql = Sql & "   and aa.Revision in ('0','00','000','R00')  "
+    Sql = Sql & "   and ((aa.IssueDate >= '" & FromDate & "') AND (aa.IssueDate < '" & ToDate & "'))  "
+    Sql = Sql & "   and (aa.IssueDate = (select min(cc.IssueDate) From ( "
+    Sql = Sql & "      SELECT min(iss.t_isdt) as IssueDate from tdmisg011200 as iss where iss.t_docn = aa.DocumentID and iss.t_revi= aa.Revision  "
+    Sql = Sql & "      UNION ALL  "
+    Sql = Sql & "      select min(th.t_isdt) as IssueDate from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran where tl.t_docn = aa.DocumentID and tl.t_revn= aa.Revision  "
+    Sql = Sql & "                      ) as cc)) "
+    Sql = Sql & " Order By aa.DocumentID, aa.IssueDate"
+    Dim Results As List(Of ProductivityReportClass) = Nothing
+    Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString() & ";Connection Timeout=2400")
+      Using Cmd As SqlCommand = Con.CreateCommand()
+        Cmd.CommandType = CommandType.Text
+        Cmd.CommandText = Sql
+        Cmd.CommandTimeout = 2400
+        Results = New List(Of ProductivityReportClass)
+        Con.Open()
+        Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+        While (Reader.Read())
+          Results.Add(New ProductivityReportClass(Reader))
+        End While
+        Reader.Close()
+      End Using
+    End Using
+    Return Results
+  End Function
   Public Shared Function GetNewProductivityReport(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As List(Of ProductivityReportClass)
     'Convert From & TO Date yyyy-mm-dd
     ToDate = Convert.ToDateTime(ToDate).AddDays(1)
@@ -566,6 +780,7 @@ Public Class ProductivityReportClass
     Sql = Sql & "			iss.t_revi as Revision, "
     Sql = Sql & "			iss.t_shsz as SheetSize "
     Sql = Sql & "	  from tdmisg011200 as iss  "
+    Sql = Sql & "	  where iss.t_isdt >= '" & FromDate & "'"
     Sql = Sql & "	  Union All "
     Sql = Sql & "	  select "
     Sql = Sql & "	    tl.t_docn as DocumentID, "
@@ -573,6 +788,7 @@ Public Class ProductivityReportClass
     Sql = Sql & "	    tl.t_revn as Revision, "
     Sql = Sql & "		  (select dl.t_size from tdmisg121200 as dl where dl.t_docn=tl.t_docn and dl.t_revn=tl.t_revn) as SheetSize "
     Sql = Sql & "	  from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran "
+    Sql = Sql & "	  where th.t_isdt >= '" & FromDate & "'"
     Sql = Sql & "	) as aa  "
     Sql = Sql & " where substring(aa.DocumentID,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
     Sql = Sql & " and   substring(aa.DocumentID,1,20)+ substring('0000'+ltrim(substring(aa.DocumentID,21,4)) ,len('0000'+ltrim(substring(aa.DocumentID,21,4)))-3,4)   "
@@ -590,11 +806,11 @@ Public Class ProductivityReportClass
     Sql = Sql & "                      ) as cc)) "
     Sql = Sql & " Order By aa.DocumentID, aa.IssueDate"
     Dim Results As List(Of ProductivityReportClass) = Nothing
-    Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+    Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString() & ";Connection Timeout=2400")
       Using Cmd As SqlCommand = Con.CreateCommand()
         Cmd.CommandType = CommandType.Text
         Cmd.CommandText = Sql
-        Cmd.CommandTimeout = 1200
+        Cmd.CommandTimeout = 2400
         Results = New List(Of ProductivityReportClass)
         Con.Open()
         Dim Reader As SqlDataReader = Cmd.ExecuteReader()
@@ -607,8 +823,111 @@ Public Class ProductivityReportClass
     Return Results
   End Function
 
-
   'ISSUED-NO Hrs Entry
+  Public Shared Function GetBoilerDocumentIssuedButNoHRSEntry(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As List(Of ProductivityReportClass)
+    'Convert From & TO Date yyyy-mm-dd
+    ToDate = Convert.ToDateTime(ToDate).AddDays(1)
+    FromDate = FromDate.Substring(6, 4) & "-" & FromDate.Substring(3, 2) & "-" & FromDate.Substring(0, 2)
+    ToDate = ToDate.Substring(6, 4) & "-" & ToDate.Substring(3, 2) & "-" & ToDate.Substring(0, 2)
+    Dim FilterActivity As String = "(1,2,75,77)"
+    Dim FilterGroup As String = "('ENGG001','ENGGC','ENGGD','ENGGF','ENGG005','ENGG002','ENGG003','ENGG004')"
+    Dim VaultDB As String = "BOILER"
+    Select Case Division
+      Case "PUNE"
+        FilterActivity = "(1,2)"
+        FilterGroup = "('PUNE001')"
+        VaultDB = "SMD"
+      Case "SMD"
+        FilterActivity = "(1,2)"
+        FilterGroup = "('ENGGI')"
+        VaultDB = "SMD"
+      Case "CHENNAI"
+        FilterActivity = "(1,2,75,77)"
+        FilterGroup = "('ENGG005')"
+        VaultDB = "BOILER"
+      Case "EPC"
+        VaultDB = "EPC"
+        FilterActivity = "(1,2)"
+        FilterGroup = "('ENGGM','ENGG011','ENGG012','ENGG013','ENGG014','ENGG015')"
+      Case "APC"
+        VaultDB = "PC"
+        FilterActivity = "(1,2,75,77)"
+        FilterGroup = "('ENGG007')"
+      Case "BOILER"
+        FilterActivity = "(1,2,75,77,10,19,57,61,76)"
+        FilterGroup = "('ENGG001','ENGGA','ENGGB','ENGGC','ENGGD','ENGGE','ENGGF','ENGGG','ENGGH','ENGG005','ENGG002','ENGG003','ENGG004','ENGG005','ENGG006','ENGG007','ENGG008','ENGG009')"
+        VaultDB = "BOILER"
+    End Select
+    Dim Sql As String = ""
+    Sql = Sql & " select * from (select "
+    Sql = Sql & "	aa.DocumentID, "
+    Sql = Sql & "	aa.IssueDate, "
+    Sql = Sql & "	aa.Revision, "
+    Sql = Sql & "	aa.SheetSize, "
+    Sql = Sql & " (select top 1 ltrim(t_size) from tdmisg001200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as dmSize, "
+    Sql = Sql & "	(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Discipline, "
+    Sql = Sql & "	(select top 1 isnull(t_oscd,2) from tdmisg140200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Outsourced, "
+    Sql = Sql & "    (select sum(hh.t_hhrs)    "
+    Sql = Sql & "       from ttiisg910200 hh "
+    Sql = Sql & "       where hh.t_acid in " & FilterActivity
+    Sql = Sql & "		      and aa.DocumentID = hh.t_cdoc "
+    Sql = Sql & "         and cast(hh.t_tdat as date)<=cast(dateadd(d,2,aa.IssueDate) as date)  "
+    Sql = Sql & "         and hh.t_grcd in " & FilterGroup
+    Sql = Sql & "         ) as Hours, "
+    Sql = Sql & "        (select top 1 hh.t_grcd    "
+    Sql = Sql & "            from ttiisg910200 hh "
+    Sql = Sql & "		         where aa.DocumentID = hh.t_cdoc "
+    Sql = Sql & "              and hh.t_acid in " & FilterActivity
+    Sql = Sql & "              and hh.t_grcd in " & FilterGroup
+    Sql = Sql & "        ) as GroupID,"
+    Sql = Sql & "        aa.DocumentID as IssDoc "
+    Sql = Sql & "	From ( "
+    'Sql = Sql & "		select "
+    'Sql = Sql & "			iss.t_docn as DocumentID, "
+    'Sql = Sql & "			iss.t_isdt as IssueDate, "
+    'Sql = Sql & "			iss.t_revi as Revision, "
+    'Sql = Sql & "			iss.t_shsz as SheetSize "
+    'Sql = Sql & "	  from tdmisg011200 as iss  "
+    'Sql = Sql & "	  Union All "
+    Sql = Sql & "	  select "
+    Sql = Sql & "	    tl.t_docn as DocumentID, "
+    Sql = Sql & "	    th.t_isdt as IssueDate, "
+    Sql = Sql & "	    tl.t_revn as Revision, "
+    Sql = Sql & "		  (select dl.t_size from tdmisg121200 as dl where dl.t_docn=tl.t_docn and dl.t_revn=tl.t_revn) as SheetSize "
+    Sql = Sql & "	  from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran "
+    Sql = Sql & "	) as aa  "
+    Sql = Sql & " inner join tdmisg001200 as dm on dm.t_docn = aa.DocumentID and dm.t_revn = aa.Revision "
+    Sql = Sql & " where substring(aa.DocumentID,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
+    Sql = Sql & "   and upper(dm.t_name) = '" & VaultDB & "' "
+    Sql = Sql & "   and aa.Revision in ('0','00','000','R00')  "
+    Sql = Sql & "   and ((aa.IssueDate >= '" & FromDate & "') AND (aa.IssueDate < '" & ToDate & "'))  "
+    Sql = Sql & "   and (aa.IssueDate = (select min(cc.IssueDate) From ( "
+    Sql = Sql & "      SELECT min(iss.t_isdt) as IssueDate from tdmisg011200 as iss where iss.t_docn = aa.DocumentID and iss.t_revi= aa.Revision  "
+    Sql = Sql & "      UNION ALL  "
+    Sql = Sql & "      select min(th.t_isdt) as IssueDate from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran where tl.t_docn = aa.DocumentID and tl.t_revn= aa.Revision  "
+    Sql = Sql & "                      ) as cc)) ) as ll "
+    Sql = Sql & " WHERE ll.Hours is null ORDER By ll.DocumentID,ll.IssueDate"
+
+
+
+
+    Dim Results As List(Of ProductivityReportClass) = Nothing
+    Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString() & ";Connection Timeout=2400")
+      Using Cmd As SqlCommand = Con.CreateCommand()
+        Cmd.CommandType = CommandType.Text
+        Cmd.CommandText = Sql
+        Cmd.CommandTimeout = 2400
+        Results = New List(Of ProductivityReportClass)
+        Con.Open()
+        Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+        While (Reader.Read())
+          Results.Add(New ProductivityReportClass(Reader))
+        End While
+        Reader.Close()
+      End Using
+    End Using
+    Return Results
+  End Function
   Public Shared Function GetDocumentIssuedButNoHRSEntry(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As List(Of ProductivityReportClass)
     'Convert From & TO Date yyyy-mm-dd
     ToDate = Convert.ToDateTime(ToDate).AddDays(1)

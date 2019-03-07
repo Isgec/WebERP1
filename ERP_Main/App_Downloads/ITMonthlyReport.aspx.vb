@@ -396,42 +396,9 @@ Public Class MRNData
   Public Property EPCLM As Integer = 0
   Public Property EPCLL As Integer = 0
 
-  'Public Shared Function GetDateObj(ByVal FMon As String) As DateObj
-  '  Dim x As New DateObj
-  '  Dim cYr As Integer = Now.Year
-  '  Select Case FMon
-  '    Case "01"
-  '      x.c_FromDate = "01/" & FMon & "/" & cYr
-  '      x.c_ToDate = x.c_FromDate.AddMonths(1).AddDays(-1)
-  '      cYr = cYr - 1
-  '      x.l_FromDate = "01/12/" & cYr
-  '      x.l_ToDate = x.l_FromDate.AddMonths(1).AddDays(-1)
-  '      x.ll_FromDate = "01/11/" & cYr
-  '      x.ll_ToDate = x.ll_FromDate.AddMonths(1).AddDays(-1)
-  '    Case "02"
-  '      x.c_FromDate = "01/" & FMon & "/" & cYr
-  '      x.c_ToDate = x.c_FromDate.AddMonths(1).AddDays(-1)
-  '      x.l_FromDate = "01/01/" & cYr
-  '      x.l_ToDate = x.l_FromDate.AddMonths(1).AddDays(-1)
-  '      cYr = cYr - 1
-  '      x.ll_FromDate = "01/12/" & cYr
-  '      x.ll_ToDate = x.ll_FromDate.AddMonths(1).AddDays(-1)
-  '    Case Else
-  '      x.c_FromDate = "01/" & FMon & "/" & cYr
-  '      x.c_ToDate = x.c_FromDate.AddMonths(1).AddDays(-1)
-  '      FMon = Convert.ToString(Convert.ToInt32(FMon) - 1).PadLeft(2, "0")
-  '      x.l_FromDate = "01/" & FMon & "/" & cYr
-  '      x.l_ToDate = x.l_FromDate.AddMonths(1).AddDays(-1)
-  '      FMon = Convert.ToString(Convert.ToInt32(FMon) - 1).PadLeft(2, "0")
-  '      x.ll_FromDate = "01/" & FMon & "/" & cYr
-  '      x.ll_ToDate = x.ll_FromDate.AddMonths(1).AddDays(-1)
-  '  End Select
-
-  '  Return x
-  'End Function
   Public Shared Function GetDateObj(ByVal FMon As String) As DateObj
     Dim x As New DateObj
-    Dim cYr As Integer = Now.Year
+    Dim cYr As Integer = 2018
     Select Case FMon
       Case "01"
         x.c_FromDate = "01/" & FMon & "/" & cYr
@@ -638,7 +605,7 @@ Public Class NOTESData
 
   Public Shared Function GetDateObj(ByVal FMon As String) As DateObj
     Dim x As New DateObj
-    Dim cYr As Integer = Now.Year
+    Dim cYr As Integer = 2018
     Select Case FMon
       Case "01"
         x.c_FromDate = "01/" & FMon & "/" & cYr
@@ -799,7 +766,7 @@ Public Class PKLData
   'End Function
   Public Shared Function GetDateObj(ByVal FMon As String) As DateObj
     Dim x As New DateObj
-    Dim cYr As Integer = Now.Year
+    Dim cYr As Integer = 2018
     Select Case FMon
       Case "01"
         x.c_FromDate = "01/" & FMon & "/" & cYr
@@ -945,7 +912,7 @@ Public Class POWData
 
   Public Shared Function GetDateObj(ByVal FMon As String) As DateObj
     Dim x As New DateObj
-    Dim cYr As Integer = Now.Year
+    Dim cYr As Integer = 2018
     Select Case FMon
       Case "01"
         x.c_FromDate = "01/" & FMon & "/" & cYr
@@ -1099,7 +1066,7 @@ Public Class IDMSData
 
   Public Shared Function GetDateObj(ByVal FMon As String) As DateObj
     Dim x As New DateObj
-    Dim cYr As Integer = Now.Year
+    Dim cYr As Integer = 2018
     Select Case FMon
       Case "01"
         x.c_FromDate = "01/" & FMon & "/" & cYr
@@ -1240,7 +1207,7 @@ Public Class MRNVData
   'End Function
   Public Shared Function GetDateObj(ByVal FMon As String) As DateObj
     Dim x As New DateObj
-    Dim cYr As Integer = Now.Year
+    Dim cYr As Integer = 2018
     Select Case FMon
       Case "01"
         x.c_FromDate = "01/" & FMon & "/" & cYr
