@@ -1,9 +1,17 @@
-<%@ Page Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" CodeFile="GF_ErectionDrawingList.aspx.vb" Inherits="GF_ErectionDrawingList" title="List: Erection Drawing" %>
+<%@ Page Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" CodeFile="GF_ErectionDrawingList.aspx.vb" Inherits="GF_ErectionDrawingList" title="List: Released Drawing List" %>
 <asp:Content ID="CPHlgDMisg" ContentPlaceHolderID="cph1" Runat="Server">
-<div id="div1" class="page">
+<div class="ui-widget-content page">
+<div class="caption">
+    <asp:Label ID="LabeltaBH" runat="server" Text="&nbsp;List: Released Documents"></asp:Label>
+</div>
+<div class="pagedata">
 <asp:UpdatePanel ID="UPNLlgDMisg" runat="server">
   <ContentTemplate>
-    <asp:Label ID="LabellgDMisg" runat="server" Text="&nbsp;List: BaaN Document" Width="100%" CssClass="sis_formheading"></asp:Label>
+    <LGM:ToolBar0 
+      ID = "TBLerpEvaluateByIT"
+      ToolType="lgNReport"
+      SkinID = "tbl_blue"
+      runat = "server" />
     <table width="100%"><tr><td class="sis_formview"> 
     <asp:UpdateProgress ID="UPGSlgDMisg" runat="server" AssociatedUpdatePanelID="UPNLlgDMisg" DisplayAfter="100">
       <ProgressTemplate>
@@ -34,21 +42,30 @@
     <br />
     <table>
 			<tr>
-				<td>Project ID
+				<td style="text-align:right;"><b>Project ID :</b>
 				</td>
 				<td><input type="text" id="F_ProjectID" maxlength="6" style="width: 76px; text-transform:uppercase" class="mytxt" />
 				</td>
-				<td>Released or Modified in Last [Days]
+      </tr>
+      <tr>
+				<td><b>Released or Modified in Last [Days] :</b>
 				</td>
 				<td><input type="text" id="F_Days" maxlength="6" style="width: 76px" class="mytxt" value="30" />
 				</td>
-				<td>
+      </tr>
+      <tr>
+				<td colspan="2" style="text-align:right;">
 					<input type="button" onclick="return script_download('F_ProjectID','F_Days');" value=" Download " />
 				</td>
 			</tr>
     </table>
   </td></tr></table>
+    <asp:GridView ID="GVerpEvaluateByIT" SkinID="gv_silver" BorderColor="#A9A9A9" width="100%" runat="server" AllowPaging="True" AllowSorting="True" AutoGenerateColumns="False" DataKeyNames="ApplID,RequestID">
+
+    </asp:GridView>
+
   </ContentTemplate>
 </asp:UpdatePanel>
 </div>
+  </div>
 </asp:Content>
