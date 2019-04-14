@@ -15,8 +15,15 @@ Namespace SIS.ERP
 		Private _DetentionatDaysULP As String = 0
 		Private _ULPisICDCFSPort As Boolean = False
 		Private _DetentionatDaysLP As String = 0
-		Private _LPisISGECWorks As Boolean = False
-		Public Property BackToTownCharges() As String
+    Private _LPisISGECWorks As Boolean = False
+    Public Property ErrMessage As String = ""
+    Public Property RecordType As String = ""
+    Public ReadOnly Property dRecordType As String
+      Get
+        If RecordType <> "" Then Return RecordType.Substring(0, 1) Else Return ""
+      End Get
+    End Property
+    Public Property BackToTownCharges() As String
 			Get
 				Return _BackToTownCharges
 			End Get
@@ -308,48 +315,121 @@ Namespace SIS.ERP
 			SIS.ERP.erpCreateTPTBill.UpdateData(Results)
 			Return Results
 		End Function
-		Public Shared Function UZ_erpCreateTPTBillSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal TPTCode As String, ByVal ProjectID As String, ByVal BillStatus As Int32) As List(Of SIS.ERP.erpCreateTPTBill)
-			Dim Results As List(Of SIS.ERP.erpCreateTPTBill) = Nothing
-			Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
-				Using Cmd As SqlCommand = Con.CreateCommand()
-					If OrderBy = String.Empty Then OrderBy = "SerialNo DESC"
-					Cmd.CommandType = CommandType.StoredProcedure
-					If SearchState Then
-						Cmd.CommandText = "sperp_LG_CreateTPTBillSelectListSearch"
-						Cmd.CommandText = "sperpCreateTPTBillSelectListSearch"
-						SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
-					Else
-						Cmd.CommandText = "sperp_LG_CreateTPTBillSelectListFilteres"
-						Cmd.CommandText = "sperpCreateTPTBillSelectListFilteres"
-						SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_TPTCode", SqlDbType.NVarChar, 9, IIf(TPTCode Is Nothing, String.Empty, TPTCode))
-						SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_ProjectID", SqlDbType.NVarChar, 6, IIf(ProjectID Is Nothing, String.Empty, ProjectID))
-						SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_BillStatus", SqlDbType.Int, 10, IIf(BillStatus = Nothing, 0, BillStatus))
-					End If
-					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
-					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
-					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
-					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
-					Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
-					Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
-					_RecordCount = -1
-					Results = New List(Of SIS.ERP.erpCreateTPTBill)()
-					Con.Open()
-					Dim Reader As SqlDataReader = Cmd.ExecuteReader()
-					While (Reader.Read())
-						Results.Add(New SIS.ERP.erpCreateTPTBill(Reader))
-					End While
-					Reader.Close()
-					_RecordCount = Cmd.Parameters("@RecordCount").Value
-				End Using
-			End Using
-			Return Results
-		End Function
-		Public Shared Function UZ_erpCreateTPTBillInsert(ByVal Record As SIS.ERP.erpCreateTPTBill) As SIS.ERP.erpCreateTPTBill
-			Record.BillStatus = 2
-			Dim _Result As SIS.ERP.erpCreateTPTBill = erpCreateTPTBillInsert(Record)
-			Return _Result
-		End Function
-		Public Shared Function UZ_erpCreateTPTBillUpdate(ByVal Record As SIS.ERP.erpCreateTPTBill) As SIS.ERP.erpCreateTPTBill
+    Public Shared Function UZ_erpCreateTPTBillSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal TPTCode As String, ByVal ProjectID As String, ByVal BillStatus As Int32, ByVal Pending As Boolean) As List(Of SIS.ERP.erpCreateTPTBill)
+      Dim Results As List(Of SIS.ERP.erpCreateTPTBill) = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          If OrderBy = String.Empty Then OrderBy = "SerialNo DESC"
+          Cmd.CommandType = CommandType.StoredProcedure
+          If SearchState Then
+            Cmd.CommandText = "sperp_LG_CreateTPTBillSelectListSearch"
+            Cmd.CommandText = "sperpCreateTPTBillSelectListSearch"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
+          Else
+            Cmd.CommandText = "sperp_LG_CreateTPTBillSelectListFilteres"
+            Cmd.CommandText = "sperpCreateTPTBillSelectListFilteres"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_TPTCode", SqlDbType.NVarChar, 9, IIf(TPTCode Is Nothing, String.Empty, TPTCode))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_ProjectID", SqlDbType.NVarChar, 6, IIf(ProjectID Is Nothing, String.Empty, ProjectID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_BillStatus", SqlDbType.Int, 10, IIf(BillStatus = Nothing, 0, BillStatus))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Pending", SqlDbType.Bit, 3, Pending)
+          End If
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
+          Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
+          Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
+          _RecordCount = -1
+          Results = New List(Of SIS.ERP.erpCreateTPTBill)()
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            Results.Add(New SIS.ERP.erpCreateTPTBill(Reader))
+          End While
+          Reader.Close()
+          _RecordCount = Cmd.Parameters("@RecordCount").Value
+        End Using
+      End Using
+      Return Results
+    End Function
+    Public Shared Function erpCreateTPTBillSelectCount(ByVal SearchState As Boolean, ByVal SearchText As String, ByVal TPTCode As String, ByVal ProjectID As String, ByVal BillStatus As Int32, ByVal Pending As Boolean) As Integer
+      Return _RecordCount
+    End Function
+    Public Shared Function UZ_erpCreateTPTBillInsert(ByVal Record As SIS.ERP.erpCreateTPTBill) As SIS.ERP.erpCreateTPTBill
+      Dim NextClubNo As String = ""
+      Select Case Record.BillType
+        Case ""
+        Case "Freight Bill"
+        Case "Freight Bill With Detention"
+        Case "Freight And Detention Separate Bills"
+          NextClubNo = GetNextClubNo()
+      End Select
+      Record.ClubbingNo = NextClubNo
+      Record.BillStatus = 2
+      Record.CreatedBy = Global.System.Web.HttpContext.Current.Session("LoginID")
+      Record.CreatedOn = Now
+      Record.RecordType = "Freight"
+      Dim _Result As SIS.ERP.erpCreateTPTBill = InsertData(Record)
+      Select Case Record.BillType
+        Case ""
+        Case "Freight Bill"
+        Case "Freight Bill With Detention"
+        Case "Freight And Detention Separate Bills"
+          Dim dRecord As New SIS.ERP.erpCreateTPTBill
+          With dRecord
+            .ClubbingNo = NextClubNo
+            .BillStatus = 2
+            .CreatedBy = Global.System.Web.HttpContext.Current.Session("LoginID")
+            .CreatedOn = Now
+            .BillType = Record.BillType
+            .RecordType = "Detention"
+            .[TPTBillNo] = Record.dTPTBillNo
+            .[IRNumber] = Record.dIRNumber
+            .[TPTBillDate] = Record.dTPTBillDate
+            .[TPTBillReceivedOn] = Record.dTPTBillReceivedOn
+            .[GRNos] = Record.GRNos
+            .[TPTCode] = Record.TPTCode
+            .[PONumber] = Record.PONumber
+            .[ProjectID] = Record.ProjectID
+            .[TPTBillAmount] = Record.dTPTBillAmount
+            .[DetentionatLP] = Record.dDetentionatLP
+            .[DetentionatULP] = Record.dDetentionatULP
+            .DetentionatDaysLP = Record.dDetentionatDaysLP
+            .LPisISGECWorks = Record.dLPisISGECWorks
+            .DetentionatDaysULP = Record.dDetentionatDaysULP
+            .ULPisICDCFSPort = Record.dULPisICDCFSPort
+            .AssessableValue = Record.dAssessableValue
+            .IGSTRate = Record.dIGSTRate
+            .IGSTAmount = Record.dIGSTAmount
+            .SGSTRate = Record.dSGSTRate
+            .SGSTAmount = Record.dSGSTAmount
+            .CGSTRate = Record.dCGSTRate
+            .CGSTAmount = Record.dCGSTAmount
+            .CessRate = Record.dCessRate
+            .CessAmount = Record.dCessAmount
+            .TotalGST = Record.dTotalGST
+            .TotalAmount = Record.dTotalAmount
+          End With
+          InsertData(dRecord)
+      End Select
+      Return _Result
+    End Function
+    Private Shared Function GetNextClubNo() As String
+      Dim mRet As Integer = 0
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = "Select isnull(max(ClubbingNo),0)+1 as cnt from ERP_TransporterBill"
+          Con.Open()
+          Dim tmp As String = Cmd.ExecuteScalar
+          If tmp IsNot Nothing Then
+            mRet = tmp
+          End If
+        End Using
+      End Using
+      Return mRet
+    End Function
+    Public Shared Function UZ_erpCreateTPTBillUpdate(ByVal Record As SIS.ERP.erpCreateTPTBill) As SIS.ERP.erpCreateTPTBill
 			Dim _Result As SIS.ERP.erpCreateTPTBill = erpCreateTPTBillUpdate(Record)
 			Return _Result
 		End Function
@@ -357,32 +437,40 @@ Namespace SIS.ERP
 			Dim _Result As Integer = erpCreateTPTBillDelete(Record)
 			Return _Result
 		End Function
-		Public Shared Function getIRData(ByVal value As String) As String
-			Dim aVal() As String = value.Split(",".ToCharArray)
-			Dim mRet As String = "0|" & aVal(0)
-			Dim IRNo As Int32 = CType(aVal(1).Replace("_", ""), Int32)
-			Dim oTptBill As SIS.ERP.erpCreateTPTBill = SIS.ERP.erpCreateTPTBill.erpCreateTPTBillGetByIRNumber(IRNo)
-			If oTptBill IsNot Nothing Then
-				mRet = "1|" & aVal(0) & "| IR Number already used."
-				Return mRet
-			End If
-			Dim Results As SIS.ERP.erpCreateTPTBill = Nothing
-			Dim Sql As String = ""
-			Sql = Sql & "select "
-			Sql = Sql & "ir.t_ninv as IRNo,"
-			Sql = Sql & "ir.t_refr as IRDescription,"
-			Sql = Sql & "ir.t_cdf_pono as PONumber,"
-			Sql = Sql & "ir.t_cdf_irdt as TPTBillReceivedOn,"
-			Sql = Sql & "ir.t_cdf_cprj as ProjectID,"
-			Sql = Sql & "ir.t_amti as POAmount,"
-			Sql = Sql & "ir.t_ifbp as TPTCode,"
-			Sql = Sql & "ir.t_isup as TPTBillNo,"
-			Sql = Sql & "ir.t_invd as TPTBillDate,"
-			Sql = Sql & "ir.t_amti as TPTBillAmount, "
-			Sql = Sql & "gr.t_grno as GRNOs "
-			Sql = Sql & "from ttfacp100200 as ir "
-			Sql = Sql & "left outer join ttfisg002200 as gr on ir.t_ninv = gr.t_irno "
-			Sql = Sql & "where ir.t_ninv = " & IRNo
+    Public Shared Function getIRData(ByVal IRNo As String) As SIS.ERP.erpCreateTPTBill
+      Dim oTptBill As SIS.ERP.erpCreateTPTBill = SIS.ERP.erpCreateTPTBill.erpCreateTPTBillGetByIRNumber(IRNo)
+      If oTptBill IsNot Nothing Then
+        Throw New Exception("IR Number already used.")
+      End If
+      Dim Results As SIS.ERP.erpCreateTPTBill = Nothing
+      Dim Sql As String = ""
+      Sql = Sql & "select "
+      Sql = Sql & "ir.t_ninv as IRNo, "
+      Sql = Sql & "ir.t_refr as IRDescription, "
+      Sql = Sql & "ir.t_cdf_pono as PONumber, "
+      Sql = Sql & "ir.t_cdf_irdt as TPTBillReceivedOn, "
+      Sql = Sql & "ir.t_cdf_cprj as ProjectID, "
+      Sql = Sql & "ir.t_amti as POAmount, "
+      Sql = Sql & "ir.t_ifbp as TPTCode,"
+      Sql = Sql & "ir.t_isup as TPTBillNo,"
+      Sql = Sql & "ir.t_invd as TPTBillDate,"
+      Sql = Sql & "ir.t_amti as TPTBillAmount, "
+      Sql = Sql & "gst.t_assv as AssessableValue, "
+      Sql = Sql & "gst.t_irat as IGSTRate, "
+      Sql = Sql & "gst.t_iamt as IGSTAmount, "
+      Sql = Sql & "gst.t_srat as SGSTRate, "
+      Sql = Sql & "gst.t_samt as SGSTAmount, "
+      Sql = Sql & "gst.t_crat as CGSTRate, "
+      Sql = Sql & "gst.t_camt as CGSTAmount, "
+      Sql = Sql & "gst.t_cess as CessRate, "
+      Sql = Sql & "gst.t_cmnt as CessAmount, "
+      Sql = Sql & "gst.t_tgmt as TotalGST, "
+      Sql = Sql & "gst.t_tval as TotalAmount, "
+      Sql = Sql & "gr.t_grno as GRNOs "
+      Sql = Sql & "from ttfacp100200 as ir "
+      Sql = Sql & "left outer join ttfisg407200 as gst on ir.t_ninv = gst.t_ninv and gst.t_pono=1 "
+      Sql = Sql & "left outer join ttfisg002200 as gr on ir.t_ninv = gr.t_irno "
+      Sql = Sql & "where ir.t_ninv = " & IRNo
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.Text
@@ -398,17 +486,35 @@ Namespace SIS.ERP
           Reader.Close()
         End Using
       End Using
-      mRet &= "|" & Results.TPTBillNo
-			mRet &= "|" & Results.TPTBillDate
-			mRet &= "|" & Results.GRNos
-			mRet &= "|" & Results.TPTCode
-			mRet &= "|" & Results.PONumber
-			mRet &= "|" & Results.ProjectID
-			mRet &= "|" & Results.TPTBillAmount
-			mRet &= "|" & Results.TPTBillReceivedOn
-			Return mRet
-		End Function
-		Public Shared Function GetByReceiptDate(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal FromDate As String, ByVal ToDate As String, ByVal StatusID As String) As List(Of SIS.ERP.erpCreateTPTBill)
+      Return Results
+    End Function
+    Public Shared Function getStrIRData(ByVal oTptBill As SIS.ERP.erpCreateTPTBill) As String
+      Dim mRet As String = ""
+      If oTptBill Is Nothing Then Return mRet
+      With oTptBill
+        mRet &= "|" & .TPTBillNo
+        mRet &= "|" & .TPTBillDate
+        mRet &= "|" & .GRNos
+        mRet &= "|" & .TPTCode
+        mRet &= "|" & .PONumber
+        mRet &= "|" & .ProjectID
+        mRet &= "|" & .TPTBillAmount
+        mRet &= "|" & .TPTBillReceivedOn
+        mRet &= "|" & .AssessableValue
+        mRet &= "|" & .IGSTRate
+        mRet &= "|" & .IGSTAmount
+        mRet &= "|" & .CGSTRate
+        mRet &= "|" & .CGSTAmount
+        mRet &= "|" & .SGSTRate
+        mRet &= "|" & .SGSTAmount
+        mRet &= "|" & .CessRate
+        mRet &= "|" & .CessAmount
+        mRet &= "|" & .TotalGST
+        mRet &= "|" & .TotalAmount
+      End With
+      Return mRet
+    End Function
+    Public Shared Function GetByReceiptDate(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal FromDate As String, ByVal ToDate As String, ByVal StatusID As String) As List(Of SIS.ERP.erpCreateTPTBill)
 			Dim Results As List(Of SIS.ERP.erpCreateTPTBill) = Nothing
 			Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
 				Using Cmd As SqlCommand = Con.CreateCommand()

@@ -16,18 +16,18 @@ var script_erpCreateTPTBill = {
 		  var o = $get(p[1]);
 		  o.style.backgroundImage  = 'none';
 		  if(p[0]=='1'){
-		  	try { $get('ctl00_cph1_FVerpCreateTPTBill_L_ErrMsgerpCreateTPTBill').innerHTML = p[2]; } catch (ex) { }
+		  	try { $get('L_ErrMsgerpCreateTPTBill').innerHTML = p[2]; } catch (ex) { }
 		    o.value='';
 		    o.focus();
 		  }else{
-		  try { $get('ctl00_cph1_FVerpCreateTPTBill_F_TPTBillNo').value = p[2]; } catch (ex) { }
-		  try { $get('ctl00_cph1_FVerpCreateTPTBill_F_TPTBillDate').value = p[3]; } catch (ex) { }
-		  try { $get('ctl00_cph1_FVerpCreateTPTBill_F_GRNOs').value = p[4]; } catch (ex) { }
-		  try { $get('ctl00_cph1_FVerpCreateTPTBill_F_TPTCode').value = p[5]; } catch (ex) { }
-		  try { $get('ctl00_cph1_FVerpCreateTPTBill_F_PONumber').value = p[6]; } catch (ex) { }
-		  try { $get('ctl00_cph1_FVerpCreateTPTBill_F_ProjectID').value = p[7]; } catch (ex) { }
-		  try { $get('ctl00_cph1_FVerpCreateTPTBill_F_TPTBillAmount').value = p[8]; } catch (ex) { }
-		  try { $get('ctl00_cph1_FVerpCreateTPTBill_F_TPTBillReceivedOn').value = p[9]; } catch (ex) { }
+		  try { $get('F_TPTBillNo').value = p[2]; } catch (ex) { }
+		  try { $get('F_TPTBillDate').value = p[3]; } catch (ex) { }
+		  try { $get('F_GRNOs').value = p[4]; } catch (ex) { }
+		  try { $get('F_TPTCode').value = p[5]; } catch (ex) { }
+		  try { $get('F_PONumber').value = p[6]; } catch (ex) { }
+		  try { $get('F_ProjectID').value = p[7]; } catch (ex) { }
+		  try { $get('F_TPTBillAmount').value = p[8]; } catch (ex) { }
+		  try { $get('F_TPTBillReceivedOn').value = p[9]; } catch (ex) { }
 		 }
 		},
 		ACETPTCode_Selected: function(sender, e) {

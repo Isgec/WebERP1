@@ -7,6 +7,8 @@ Namespace SIS.ERP
   <DataObject()> _
   Partial Public Class erpCreateTPTBill
     Private Shared _RecordCount As Integer
+    Public Property ClubbingNo As String = ""
+    Public Property BillType As String = ""
     Private _SerialNo As Int32 = 0
     Private _TPTBillNo As String = ""
     Private _TPTBillDate As String = ""
@@ -70,6 +72,45 @@ Namespace SIS.ERP
     Private _FK_ERP_TransporterBill_BillStatus As SIS.ERP.erpTPTBillStatus = Nothing
     Private _FK_ERP_TransporterBill_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_ERP_TransporterBill_TPTCode As SIS.VR.vrTransporters = Nothing
+    Public Property dSerialNo As Int32 = 0
+    Public Property dIRNumber As String = ""
+    Public Property dTPTBillNo As String = ""
+    Public Property dTPTBillDate As String = ""
+    Public Property dTPTBillReceivedOn As String = ""
+    Public Property dGRNos As String = ""
+    Public Property dTPTCode As String = ""
+    Public Property dPONumber As String = ""
+    Public Property dProjectID As String = ""
+    Public Property dTPTBillAmount As String = ""
+    Public Property dLPisISGECWorks As Boolean = False
+    Public Property dDetentionatDaysLP As String = 0
+    Public Property dDetentionatLP As String = ""
+    Public Property dULPisICDCFSPort As Boolean = False
+    Public Property dDetentionatDaysULP As String = 0
+    Public Property dDetentionatULP As String = ""
+    Public Property AssessableValue As String = "0.00"
+    Public Property IGSTRate As String = "0.00"
+    Public Property IGSTAmount As String = "0.00"
+    Public Property SGSTRate As String = "0.00"
+    Public Property SGSTAmount As String = "0.00"
+    Public Property CGSTRate As String = "0.00"
+    Public Property CGSTAmount As String = "0.00"
+    Public Property CessRate As String = "0.00"
+    Public Property CessAmount As String = "0.00"
+    Public Property TotalGST As String = "0.00"
+    Public Property TotalAmount As String = "0.00"
+    Public Property dAssessableValue As String = "0.00"
+    Public Property dIGSTRate As String = "0.00"
+    Public Property dIGSTAmount As String = "0.00"
+    Public Property dSGSTRate As String = "0.00"
+    Public Property dSGSTAmount As String = "0.00"
+    Public Property dCGSTRate As String = "0.00"
+    Public Property dCGSTAmount As String = "0.00"
+    Public Property dCessRate As String = "0.00"
+    Public Property dCessAmount As String = "0.00"
+    Public Property dTotalGST As String = "0.00"
+    Public Property dTotalAmount As String = "0.00"
+
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -825,7 +866,7 @@ Namespace SIS.ERP
     Public ReadOnly Property FK_ERP_TransporterBill_BillStatus() As SIS.ERP.erpTPTBillStatus
       Get
         If _FK_ERP_TransporterBill_BillStatus Is Nothing Then
-          _FK_ERP_TransporterBill_BillStatus = SIS.ERP.erpTPTBillStatus.erpTPTBillStatusGetByID(_BillStatus)
+          If _BillStatus <> "" Then _FK_ERP_TransporterBill_BillStatus = SIS.ERP.erpTPTBillStatus.erpTPTBillStatusGetByID(_BillStatus)
         End If
         Return _FK_ERP_TransporterBill_BillStatus
       End Get
@@ -1007,7 +1048,21 @@ Namespace SIS.ERP
 					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@BackToTownCharges", SqlDbType.Decimal, 21, IIf(Record.BackToTownCharges = "", Convert.DBNull, Record.BackToTownCharges))
 					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TarpaulinCharges", SqlDbType.Decimal, 21, IIf(Record.TarpaulinCharges = "", Convert.DBNull, Record.TarpaulinCharges))
 					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@WoodenSleeperCharges", SqlDbType.Decimal, 21, IIf(Record.WoodenSleeperCharges = "", Convert.DBNull, Record.WoodenSleeperCharges))
-					Cmd.Parameters.Add("@Return_SerialNo", SqlDbType.Int, 11)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ClubbingNo", SqlDbType.Int, 10, IIf(Record.ClubbingNo = "", Convert.DBNull, Record.ClubbingNo))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@BillType", SqlDbType.NVarChar, 50, IIf(Record.BillType = "", Convert.DBNull, Record.BillType))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AssessableValue", SqlDbType.Decimal, 23, IIf(Record.AssessableValue = "", Convert.DBNull, Record.AssessableValue))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@IGSTRate", SqlDbType.Decimal, 23, IIf(Record.IGSTRate = "", Convert.DBNull, Record.IGSTRate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@IGSTAmount", SqlDbType.Decimal, 23, IIf(Record.IGSTAmount = "", Convert.DBNull, Record.IGSTAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SGSTRate", SqlDbType.Decimal, 23, IIf(Record.SGSTRate = "", Convert.DBNull, Record.SGSTRate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SGSTAmount", SqlDbType.Decimal, 23, IIf(Record.SGSTAmount = "", Convert.DBNull, Record.SGSTAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CGSTRate", SqlDbType.Decimal, 23, IIf(Record.CGSTRate = "", Convert.DBNull, Record.CGSTRate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CGSTAmount", SqlDbType.Decimal, 23, IIf(Record.CGSTAmount = "", Convert.DBNull, Record.CGSTAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CessRate", SqlDbType.Decimal, 23, IIf(Record.CessRate = "", 0, Record.CessRate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CessAmount", SqlDbType.Decimal, 23, IIf(Record.CessAmount = "", 0, Record.CessAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalGST", SqlDbType.Decimal, 23, IIf(Record.TotalGST = "", Convert.DBNull, Record.TotalGST))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalAmount", SqlDbType.Decimal, 23, IIf(Record.TotalAmount = "", Convert.DBNull, Record.TotalAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RecordType", SqlDbType.NVarChar, 50, IIf(Record.RecordType = "", Convert.DBNull, Record.RecordType))
+          Cmd.Parameters.Add("@Return_SerialNo", SqlDbType.Int, 11)
           Cmd.Parameters("@Return_SerialNo").Direction = ParameterDirection.Output
           Con.Open()
           Cmd.ExecuteNonQuery()
@@ -1020,18 +1075,8 @@ Namespace SIS.ERP
     Public Shared Function erpCreateTPTBillUpdate(ByVal Record As SIS.ERP.erpCreateTPTBill) As SIS.ERP.erpCreateTPTBill
       Dim _Rec As SIS.ERP.erpCreateTPTBill = SIS.ERP.erpCreateTPTBill.erpCreateTPTBillGetByID(Record.SerialNo)
 			With _Rec
-				.TPTBillNo = Record.TPTBillNo
-				.TPTBillDate = Record.TPTBillDate
-				.TPTBillReceivedOn = Record.TPTBillReceivedOn
-				.CreatedBy = Global.System.Web.HttpContext.Current.Session("LoginID")
-				.CreatedOn = Now
-				.GRNos = Record.GRNos
-				.TPTCode = Record.TPTCode
-				.PONumber = Record.PONumber
-				.ProjectID = Record.ProjectID
-				.TPTBillAmount = Record.TPTBillAmount
-				.BasicFreightValue = Record.BasicFreightValue
-				.BasicFvODC = Record.BasicFvODC
+        .BasicFreightValue = Record.BasicFreightValue
+        .BasicFvODC = Record.BasicFvODC
 				.DetentionatLP = Record.DetentionatLP
 				.DetentionatDaysLP = Record.DetentionatDaysLP
 				.LPisISGECWorks = Record.LPisISGECWorks
@@ -1045,14 +1090,24 @@ Namespace SIS.ERP
 				.WoodenSleeperCharges = Record.WoodenSleeperCharges
 				.EmptyReturnCharges = Record.EmptyReturnCharges
 				.RTOChallanAmount = Record.RTOChallanAmount
-				.OtherAmount = Record.OtherAmount
-				.ServiceTax = Record.ServiceTax
-				.TotalBillPassedAmount = Record.TotalBillPassedAmount
-				.DiscReturnedToByAC = Record.DiscReturnedToByAC
+        .OtherAmount = Record.OtherAmount
+        .AssessableValue = Record.AssessableValue
+        .IGSTRate = Record.IGSTRate
+        .IGSTAmount = Record.IGSTAmount
+        .SGSTRate = Record.SGSTRate
+        .SGSTAmount = Record.SGSTAmount
+        .CGSTRate = Record.CGSTRate
+        .CGSTAmount = Record.CGSTAmount
+        .CessRate = Record.CessRate
+        .CessAmount = Record.CessAmount
+        .TotalGST = Record.TotalGST
+        .TotalAmount = Record.TotalAmount
+        .TotalBillPassedAmount = Record.TotalBillPassedAmount
+        .DiscReturnedToByAC = Record.DiscReturnedToByAC
 				.ChequeNo = Record.ChequeNo
 				.LgstRemarks = Record.LgstRemarks
-				.BillStatus = Record.BillStatus
-				.ReasonID = Record.ReasonID
+        .BillStatus = TptBillStatus.Free
+        .ReasonID = Record.ReasonID
 			End With
       Return SIS.ERP.erpCreateTPTBill.UpdateData(_Rec)
     End Function
@@ -1113,7 +1168,21 @@ Namespace SIS.ERP
 					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@BackToTownCharges", SqlDbType.Decimal, 21, IIf(Record.BackToTownCharges = "", Convert.DBNull, Record.BackToTownCharges))
 					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TarpaulinCharges", SqlDbType.Decimal, 21, IIf(Record.TarpaulinCharges = "", Convert.DBNull, Record.TarpaulinCharges))
 					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@WoodenSleeperCharges", SqlDbType.Decimal, 21, IIf(Record.WoodenSleeperCharges = "", Convert.DBNull, Record.WoodenSleeperCharges))
-					Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ClubbingNo", SqlDbType.Int, 10, IIf(Record.ClubbingNo = "", Convert.DBNull, Record.ClubbingNo))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@BillType", SqlDbType.NVarChar, 50, IIf(Record.BillType = "", Convert.DBNull, Record.BillType))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AssessableValue", SqlDbType.Decimal, 23, IIf(Record.AssessableValue = "", Convert.DBNull, Record.AssessableValue))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@IGSTRate", SqlDbType.Decimal, 23, IIf(Record.IGSTRate = "", Convert.DBNull, Record.IGSTRate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@IGSTAmount", SqlDbType.Decimal, 23, IIf(Record.IGSTAmount = "", Convert.DBNull, Record.IGSTAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SGSTRate", SqlDbType.Decimal, 23, IIf(Record.SGSTRate = "", Convert.DBNull, Record.SGSTRate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SGSTAmount", SqlDbType.Decimal, 23, IIf(Record.SGSTAmount = "", Convert.DBNull, Record.SGSTAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CGSTRate", SqlDbType.Decimal, 23, IIf(Record.CGSTRate = "", Convert.DBNull, Record.CGSTRate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CGSTAmount", SqlDbType.Decimal, 23, IIf(Record.CGSTAmount = "", Convert.DBNull, Record.CGSTAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CessRate", SqlDbType.Decimal, 23, IIf(Record.CessRate = "", 0, Record.CessRate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CessAmount", SqlDbType.Decimal, 23, IIf(Record.CessAmount = "", 0, Record.CessAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalGST", SqlDbType.Decimal, 23, IIf(Record.TotalGST = "", Convert.DBNull, Record.TotalGST))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalAmount", SqlDbType.Decimal, 23, IIf(Record.TotalAmount = "", Convert.DBNull, Record.TotalAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RecordType", SqlDbType.NVarChar, 50, IIf(Record.RecordType = "", Convert.DBNull, Record.RecordType))
+          Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1
           Con.Open()

@@ -1,24 +1,25 @@
 <%@ Page Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" CodeFile="GF_erpProcessTPTBill.aspx.vb" Inherits="GF_erpProcessTPTBill" title="Maintain List: Process Transporter Bill" %>
 <asp:Content ID="CPHerpProcessTPTBill" ContentPlaceHolderID="cph1" Runat="Server">
-<div id="div1" class="page">
+<div class="ui-widget-content page">
+<div class="caption">
+    <asp:Label ID="LabelerpProcessTPTBill" runat="server" Text="&nbsp;List: Process Transporter Bill"></asp:Label>
+</div>
+<div class="pagedata">
 <asp:UpdatePanel ID="UPNLerpProcessTPTBill" runat="server">
   <ContentTemplate>
-    <asp:Label ID="LabelerpProcessTPTBill" runat="server" Text="&nbsp;List: Process Transporter Bill" Width="100%" CssClass="sis_formheading"></asp:Label>
-    <table width="100%"><tr><td class="sis_formview"> 
+    <table style="width:100%;"><tr><td class="sis_formview"> 
     <LGM:ToolBar0 
       ID = "TBLerpProcessTPTBill"
       ToolType = "lgNMGrid"
       EditUrl = "~/ERP_Main/App_Edit/EF_erpProcessTPTBill.aspx"
       EnableAdd = "False"
       ValidationGroup = "erpProcessTPTBill"
-      Skin = "tbl_blue"
       runat = "server" />
     <asp:UpdateProgress ID="UPGSerpProcessTPTBill" runat="server" AssociatedUpdatePanelID="UPNLerpProcessTPTBill" DisplayAfter="100">
       <ProgressTemplate>
         <span style="color: #ff0033">Loading...</span>
       </ProgressTemplate>
     </asp:UpdateProgress>
-    <br />
 		<asp:Panel ID="pnlH" runat="server" CssClass="cph_filter">
 			<div style="padding: 5px; cursor: pointer; vertical-align: middle;">
 				<div style="float: left;">Filter Records </div>
@@ -150,24 +151,35 @@
 		</asp:Panel>
 		<AJX:CollapsiblePanelExtender ID="cpe1" runat="Server" TargetControlID="pnlD" ExpandControlID="pnlH" CollapseControlID="pnlH" Collapsed="True" TextLabelID="lblH" ImageControlID="imgH" ExpandedText="(Hide Filters...)" CollapsedText="(Show Filters...)" ExpandedImage="~/images/ua.png" CollapsedImage="~/images/da.png" SuppressPostBack="true" />
 		<asp:Label ID="ErrorMsg" runat="server" ForeColor="Red" Font-Bold="true" Font-Size="14px" Visible="false" Text="" />
-    <br />
     <asp:GridView ID="GVerpProcessTPTBill" SkinID="gv_silver" BorderColor="#A9A9A9" width="100%" runat="server" AllowPaging="True" AllowSorting="True" AutoGenerateColumns="False" DataSourceID="ODSerpProcessTPTBill" DataKeyNames="SerialNo">
       <Columns>
         <asp:TemplateField>
           <ItemTemplate>
-						<Table><tr>
-              <td><asp:ImageButton ID="cmdEditPage" ValidationGroup="Edit" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText="Edit" ToolTip="Edit the record." SkinID="Edit" CommandName="lgEdit" CommandArgument='<%# Container.DataItemIndex %>' /></td>
-						</tr></Table>
+            <asp:ImageButton ID="cmdEditPage" ValidationGroup="Edit" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText="Edit" ToolTip="Edit the record." SkinID="Edit" CommandName="lgEdit" CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
-          <HeaderStyle Width="30px" />
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="40px" CssClass="alignCenter" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Club No" SortExpression="ClubbingNo">
+          <ItemTemplate>
+            <asp:Label ID="L_ClubbingNo" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# EVal("ClubbingNo") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="40px" CssClass="alignCenter" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Serial No" SortExpression="SerialNo">
           <ItemTemplate>
-            <asp:Label ID="LabelSerialNo" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("SerialNo") %>'></asp:Label>
+            <asp:Label ID="LabelSerialNo" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("SerialNo") %>'></asp:Label>
           </ItemTemplate>
-          <HeaderStyle CssClass="alignright" />
-          <ItemStyle CssClass="alignright" />
-          <HeaderStyle Width="40px" />
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="40px" CssClass="alignCenter" />
+        </asp:TemplateField>
+         <asp:TemplateField HeaderText="TYPE" SortExpression="RecordType">
+          <ItemTemplate>
+            <asp:Label ID="L_RecordType" runat="server" ForeColor='<%# Eval("ForeColor") %>' ToolTip='<%# EVal("RecordType") %>' Text='<%# EVal("dRecordType") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="40px" CssClass="alignCenter" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Transporter Bill No." SortExpression="TPTBillNo">
           <ItemTemplate>
@@ -215,9 +227,8 @@
           <ItemTemplate>
             <asp:Label ID="LabelPTRAmount" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("PTRAmount") %>'></asp:Label>
           </ItemTemplate>
-          <HeaderStyle CssClass="alignright" />
+          <HeaderStyle CssClass="alignright"  Width="80px"  />
           <ItemStyle CssClass="alignright" />
-          <HeaderStyle Width="80px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Bank Voucher No" SortExpression="BankVCHNo">
           <ItemTemplate>
@@ -229,9 +240,9 @@
           <ItemTemplate>
             <asp:Label ID="LabelBankVCHAmount" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("BankVCHAmount") %>'></asp:Label>
           </ItemTemplate>
-          <HeaderStyle CssClass="alignright" />
+          <HeaderStyle CssClass="alignright"  Width="80px"  />
           <ItemStyle CssClass="alignright" />
-          <HeaderStyle Width="80px" />
+          <HeaderStyle/>
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Bill Status" SortExpression="ERP_TPTBillStatus8_Description">
           <ItemTemplate>
@@ -239,29 +250,26 @@
           </ItemTemplate>
           <HeaderStyle Width="100px" />
         </asp:TemplateField>
-        <asp:TemplateField HeaderText="Receive">
+        <asp:TemplateField HeaderText="REC">
           <ItemTemplate>
-						<Table><tr>
-              <td><asp:ImageButton ID="cmdApproveWF" ValidationGroup='<%# "Approve" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("ApproveWFVisible") %>' Enabled='<%# EVal("ApproveWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Receive" SkinID="approve" OnClientClick='<%# "return Page_ClientValidate(""Approve" & Container.DataItemIndex & """) && confirm(""Receive record ?"");" %>' CommandName="ApproveWF" CommandArgument='<%# Container.DataItemIndex %>' /></td>
-						</tr></Table>
+            <asp:ImageButton ID="cmdApproveWF" ValidationGroup='<%# "Approve" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("ApproveWFVisible") %>' Enabled='<%# EVal("ApproveWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Receive" SkinID="approve" OnClientClick='<%# "return Page_ClientValidate(""Approve" & Container.DataItemIndex & """) && confirm(""Receive record ?"");" %>' CommandName="ApproveWF" CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
-          <HeaderStyle Width="30px" />
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="30px" CssClass="alignCenter" />
         </asp:TemplateField>
-        <asp:TemplateField HeaderText="Return">
+        <asp:TemplateField HeaderText="RET">
           <ItemTemplate>
-						<Table><tr>
-              <td><asp:ImageButton ID="cmdRejectWF" ValidationGroup='<%# "Reject" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("RejectWFVisible") %>' Enabled='<%# EVal("RejectWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Return" SkinID="reject" OnClientClick='<%# "return Page_ClientValidate(""Reject" & Container.DataItemIndex & """) && confirm(""Return record ?"");" %>' CommandName="RejectWF" CommandArgument='<%# Container.DataItemIndex %>' /></td>
-						</tr></Table>
+           <asp:ImageButton ID="cmdRejectWF" ValidationGroup='<%# "Reject" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("RejectWFVisible") %>' Enabled='<%# EVal("RejectWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Return" SkinID="reject" OnClientClick='<%# "return Page_ClientValidate(""Reject" & Container.DataItemIndex & """) && confirm(""Return record ?"");" %>' CommandName="RejectWF" CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
-          <HeaderStyle Width="30px" />
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="30px" CssClass="alignCenter" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Processed">
           <ItemTemplate>
-						<Table><tr>
-              <td><asp:ImageButton ID="cmdCompleteWF" ValidationGroup='<%# "Complete" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("CompleteWFVisible") %>' Enabled='<%# EVal("CompleteWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Processed" SkinID="complete" OnClientClick='<%# "return Page_ClientValidate(""Complete" & Container.DataItemIndex & """) && confirm(""Processed record ?"");" %>' CommandName="CompleteWF" CommandArgument='<%# Container.DataItemIndex %>' /></td>
-						</tr></Table>
+            <asp:ImageButton ID="cmdCompleteWF" ValidationGroup='<%# "Complete" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("CompleteWFVisible") %>' Enabled='<%# EVal("CompleteWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Processed" SkinID="complete" OnClientClick='<%# "return Page_ClientValidate(""Complete" & Container.DataItemIndex & """) && confirm(""Processed record ?"");" %>' CommandName="CompleteWF" CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
-          <HeaderStyle Width="30px" />
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="30px" CssClass="alignCenter" />
         </asp:TemplateField>
       </Columns>
       <EmptyDataTemplate>
@@ -296,4 +304,5 @@
   </Triggers>
 </asp:UpdatePanel>
 </div>
+  </div>
 </asp:Content>

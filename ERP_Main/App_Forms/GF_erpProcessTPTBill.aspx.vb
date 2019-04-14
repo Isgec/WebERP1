@@ -350,8 +350,9 @@ Partial Class GF_erpProcessTPTBill
   Public Shared Function validate_FK_ERP_TransporterBill_BillStatus(ByVal value As String) As String
     Dim aVal() As String = value.Split(",".ToCharArray)
     Dim mRet As String="0|" & aVal(0)
-		Dim BillStatus As Int32 = CType(aVal(1),Int32)
-		Dim oVar As SIS.ERP.erpTPTBillStatus = SIS.ERP.erpTPTBillStatus.erpTPTBillStatusGetByID(BillStatus)
+    Dim BillStatus As String = aVal(1)
+    If BillStatus = "" Then BillStatus = 0
+    Dim oVar As SIS.ERP.erpTPTBillStatus = SIS.ERP.erpTPTBillStatus.erpTPTBillStatusGetByID(BillStatus)
     If oVar Is Nothing Then
 			mRet = "1|" & aVal(0) & "|Record not found." 
     Else

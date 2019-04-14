@@ -1,42 +1,35 @@
 Partial Class GF_erpEvaluateByIT
   Inherits SIS.SYS.GridBase
-  Private _InfoUrl As String = "~/ERP_Main/App_Display/DF_erpEvaluateByIT.aspx"
-  Protected Sub Info_Click(ByVal sender As Object, ByVal e As System.Web.UI.ImageClickEventArgs)
-    Dim oBut As ImageButton = CType(sender, ImageButton)
-    Dim aVal() As String = oBut.CommandArgument.ToString.Split(",".ToCharArray)
-    Dim RedirectUrl As String = _InfoUrl  & "?ApplID=" & aVal(0) & "&RequestID=" & aVal(1)
-    Response.Redirect(RedirectUrl)
-  End Sub
   Protected Sub GVerpEvaluateByIT_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVerpEvaluateByIT.RowCommand
-		If e.CommandName.ToLower = "lgedit".ToLower Then
-			Try
-				Dim ApplID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("ApplID")  
-				Dim RequestID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("RequestID")  
-				Dim RedirectUrl As String = TBLerpEvaluateByIT.EditUrl & "?ApplID=" & ApplID & "&RequestID=" & RequestID
-				Response.Redirect(RedirectUrl)
-			Catch ex As Exception
-			End Try
-		End If
-		If e.CommandName.ToLower = "approvewf".ToLower Then
-			Try
-				Dim EvaluationByIT As String = CType(GVerpEvaluateByIT.Rows(e.CommandArgument).FindControl("F_EvaluationByIT"),TextBox).Text
-				Dim ApplID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("ApplID")  
-				Dim RequestID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("RequestID")  
-				SIS.ERP.erpEvaluateByIT.ApproveWF(ApplID, RequestID, EvaluationByIT)
-				GVerpEvaluateByIT.DataBind()
-			Catch ex As Exception
-			End Try
-		End If
-		If e.CommandName.ToLower = "rejectwf".ToLower Then
-			Try
-				Dim EvaluationByIT As String = CType(GVerpEvaluateByIT.Rows(e.CommandArgument).FindControl("F_EvaluationByIT"),TextBox).Text
-				Dim ApplID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("ApplID")  
-				Dim RequestID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("RequestID")  
-				SIS.ERP.erpEvaluateByIT.RejectWF(ApplID, RequestID, EvaluationByIT)
-				GVerpEvaluateByIT.DataBind()
-			Catch ex As Exception
-			End Try
-		End If
+    If e.CommandName.ToLower = "lgedit".ToLower Then
+      Try
+        Dim ApplID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("ApplID")
+        Dim RequestID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("RequestID")
+        Dim RedirectUrl As String = TBLerpEvaluateByIT.EditUrl & "?ApplID=" & ApplID & "&RequestID=" & RequestID
+        Response.Redirect(RedirectUrl)
+      Catch ex As Exception
+      End Try
+    End If
+    If e.CommandName.ToLower = "approvewf".ToLower Then
+      Try
+        Dim EvaluationByIT As String = CType(GVerpEvaluateByIT.Rows(e.CommandArgument).FindControl("F_EvaluationByIT"), TextBox).Text
+        Dim ApplID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("ApplID")
+        Dim RequestID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("RequestID")
+        SIS.ERP.erpEvaluateByIT.ApproveWF(ApplID, RequestID, EvaluationByIT)
+        GVerpEvaluateByIT.DataBind()
+      Catch ex As Exception
+      End Try
+    End If
+    If e.CommandName.ToLower = "rejectwf".ToLower Then
+      Try
+        Dim EvaluationByIT As String = CType(GVerpEvaluateByIT.Rows(e.CommandArgument).FindControl("F_EvaluationByIT"), TextBox).Text
+        Dim ApplID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("ApplID")
+        Dim RequestID As Int32 = GVerpEvaluateByIT.DataKeys(e.CommandArgument).Values("RequestID")
+        SIS.ERP.erpEvaluateByIT.RejectWF(ApplID, RequestID, EvaluationByIT)
+        GVerpEvaluateByIT.DataBind()
+      Catch ex As Exception
+      End Try
+    End If
   End Sub
   Protected Sub GVerpEvaluateByIT_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles GVerpEvaluateByIT.Init
     DataClassName = "GerpEvaluateByIT"
