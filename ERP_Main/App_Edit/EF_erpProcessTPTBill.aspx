@@ -1,4 +1,4 @@
-<%@ Page Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" CodeFile="EF_erpProcessTPTBill.aspx.vb" Inherits="EF_erpProcessTPTBill" title="Edit: Process Transporter Bill" %>
+<%@ Page Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" ClientIDMode="Static" CodeFile="EF_erpProcessTPTBill.aspx.vb" Inherits="EF_erpProcessTPTBill" title="Edit: Process Transporter Bill" %>
 <asp:Content ID="CPHerpProcessTPTBill" ContentPlaceHolderID="cph1" Runat="Server">
 <div class="ui-widget-content page">
 <div class="caption">
@@ -82,7 +82,7 @@
                   Width="70px"
                   Style="text-align: right"
                   runat="server" />
-                <input type="button" id="getIRData" value="Get Payment Details from ERP" onclick="script_erpProcessTPTBill.getIRData('ctl00_cph1_FVerpProcessTPTBill_F_IRNumber');" />
+                <input type="button" id="getIRData" value="Get Payment Details from ERP" onclick="script_erpProcessTPTBill.getIRData('F_IRNumber','F_ProjectID');" />
               </td>
             </tr>
             <tr>
@@ -117,17 +117,8 @@
                   ValidationGroup="erpProcessTPTBill"
                   MaxLength="20"
                   onfocus="return this.select();"
+                  onblur="return dc(this,2);"
                   runat="server" />
-                <AJX:MaskedEditExtender
-                  ID="MEEPTRAmount"
-                  runat="server"
-                  Mask="999999999999999999.99"
-                  AcceptNegative="Left"
-                  MaskType="Number"
-                  MessageValidatorTip="true"
-                  InputDirection="RightToLeft"
-                  ErrorTooltipEnabled="true"
-                  TargetControlID="F_PTRAmount" />
               </td>
             </tr>
             <tr>
@@ -193,17 +184,8 @@
                   ValidationGroup="erpProcessTPTBill"
                   MaxLength="20"
                   onfocus="return this.select();"
+                  onblur="return dc(this,2);"
                   runat="server" />
-                <AJX:MaskedEditExtender
-                  ID="MEEBankVCHAmount"
-                  runat="server"
-                  Mask="999999999999999999.99"
-                  AcceptNegative="Left"
-                  MaskType="Number"
-                  MessageValidatorTip="true"
-                  InputDirection="RightToLeft"
-                  ErrorTooltipEnabled="true"
-                  TargetControlID="F_BankVCHAmount" />
               </td>
             </tr>
             <tr>

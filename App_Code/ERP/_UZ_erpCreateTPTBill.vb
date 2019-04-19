@@ -544,17 +544,19 @@ Namespace SIS.ERP
 		Public Shared Function getPaymentData(ByVal value As String) As String
 			Dim aVal() As String = value.Split(",".ToCharArray)
 			Dim mRet As String = "0|" & aVal(0)
-			Dim IRNo As Int32 = CType(aVal(1).Replace("_", ""), Int32)
-			Dim Results As List(Of SIS.VR.vrPaymentProcess) = SIS.VR.vrPaymentProcess.PaymentInBaaNByIRNo(IRNo)
-			If Results.Count > 0 Then
-				With Results(0)
-					mRet &= "|" & .PTRNo
-					mRet &= "|" & .PTRDate
-					mRet &= "|" & .PTRAmount
-					mRet &= "|" & .ChequeNo
-
-				End With
-			End If
+      Dim IRNo As Int32 = CType(aVal(1).Replace("_", ""), Int32)
+      Dim ProjectID As String = aVal(2)
+      Dim Results As List(Of SIS.VR.VchData) = SIS.VR.vrPaymentProcess.PaymentInBaaNByIRNo(IRNo, ProjectID)
+      If Results.Count > 0 Then
+        With Results(0)
+          mRet &= "|" & .PTRNo
+          mRet &= "|" & .PTRAmount
+          mRet &= "|" & .PTRDate
+          mRet &= "|" & .BankVoucherNo
+          mRet &= "|" & .BankVoucherAmount
+          mRet &= "|" & .BankVoucherDate
+        End With
+      End If
 			Return mRet
 		End Function
 	End Class
