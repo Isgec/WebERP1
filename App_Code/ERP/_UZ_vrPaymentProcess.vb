@@ -123,9 +123,9 @@ Namespace SIS.VR
       Sql = Sql & "    isnull((select sum(t_amth_1) from ttfgld106" & comp & " where t_otyp=ir.t_ctyp and t_odoc=ir.t_cinv and t_dbcr=2 ),0) as gld106Amth,"
       Sql = Sql & "    isnull((select top 1 t_dcdt from ttfgld106" & comp & " where t_otyp=ir.t_ctyp and t_odoc=ir.t_cinv and t_dbcr=2 ),'') as gld106Date "
       Sql = Sql & "  from ttfacp100200 as ir "
-      Sql = Sql & "    inner join ttfcmg101200 as pb on (ir.t_ctyp = pb.t_ttyp and ir.t_cinv = pb.t_ninv and pb.t_comp='" & comp & "' and t_tadv=1)  "
-      Sql = Sql & "    inner join ttfcmg100200 as cq on pb.t_btno = cq.t_pbtn "
-      Sql = Sql & "    inner join ttfcmg109200 as bt on pb.t_btno = bt.t_btno "
+      Sql = Sql & "    left outer join ttfcmg101200 as pb on (ir.t_ctyp = pb.t_ttyp and ir.t_cinv = pb.t_ninv and pb.t_comp='" & comp & "' and t_tadv=1)  "
+      Sql = Sql & "    left outer join ttfcmg100200 as cq on pb.t_btno = cq.t_pbtn "
+      Sql = Sql & "    left outer join ttfcmg109200 as bt on pb.t_btno = bt.t_btno "
       Sql = Sql & "  where ir.t_ctyp = 'PTR' and ir.t_ninv = " & IRNo
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
