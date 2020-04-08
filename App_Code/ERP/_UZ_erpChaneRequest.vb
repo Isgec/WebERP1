@@ -385,7 +385,7 @@ Namespace SIS.ERP
       oCol.ColumnSpan = "5"
       oCol.Height = 120
       oCol.Wrap = True
-      oCol.Text = oVar.ChangeSubject
+      oCol.Text = oVar.ChangeSubject.Replace(Chr(10), "<br/>")
       oRow.Cells.Add(oCol)
       oTbl.Rows.Add(oRow)
 
@@ -403,7 +403,7 @@ Namespace SIS.ERP
       oCol.ColumnSpan = "5"
       oCol.Height = 200
       oCol.Wrap = True
-      oCol.Text = oVar.ChangeDetails
+      oCol.Text = oVar.ChangeDetails.Replace(Chr(10), "<br/>")
       oRow.Cells.Add(oCol)
       oTbl.Rows.Add(oRow)
 

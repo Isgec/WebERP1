@@ -178,10 +178,10 @@
       <Columns>
         <asp:TemplateField>
           <ItemTemplate>
-						<Table><tr>
+						<table><tr>
               <td><asp:ImageButton ID="cmdEditPage" ValidationGroup="Edit" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText="Edit" ToolTip="Edit the record." SkinID="Edit" CommandName="lgEdit" CommandArgument='<%# Container.DataItemIndex %>' /></td>
               <td><asp:ImageButton ID="cmdPrintPage" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Print the record." SkinID="Print" OnClientClick="return print_report(this);" /></td>
-						</tr></Table>
+						</tr></table>
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle Width="40px" CssClass="alignCenter" />
@@ -268,6 +268,13 @@
              <asp:Label ID="L_BillStatus" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("BillStatus") %>' Text='<%# Eval("ERP_TPTBillStatus8_Description") %>'></asp:Label>
           </ItemTemplate>
           <HeaderStyle Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="A">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdAttach" runat="server" AlternateText='<%# Eval("PrimaryKey") %>' ToolTip="Attached Bill." SkinID="attach" OnClientClick='<%# Eval("GetAttachLink") %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="10px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="FWD">
           <ItemTemplate>

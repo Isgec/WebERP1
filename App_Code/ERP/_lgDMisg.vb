@@ -22,8 +22,14 @@ Namespace SIS.LG
 		Private _t_erec As String = ""
 		Private _t_prod As String = ""
 		Private _t_appr As String = ""
-		Private _t_adat As String = ""
-		Private _LG_Projects1_ProjectDescription As String = ""
+    Private _t_adat As String = ""
+    Public Property TranID As String = ""
+    Public Property Shop As String = ""
+    Public Property Ttype As String = ""
+
+    Public Property Tissue As String = ""
+
+    Private _LG_Projects1_ProjectDescription As String = ""
 		Private _FK_tdmisg001200_t_cprj As SIS.LG.lgProjects = Nothing
 		Public Property t_adat() As String
 			Get
@@ -392,11 +398,16 @@ Namespace SIS.LG
 			Else
 				_t_appr = CType(Reader("t_appr"), String)
 			End If
-			If Convert.IsDBNull(Reader("LG_Projects1_ProjectDescription")) Then
-				_LG_Projects1_ProjectDescription = String.Empty
-			Else
-				_LG_Projects1_ProjectDescription = CType(Reader("LG_Projects1_ProjectDescription"), String)
-			End If
+      If Convert.IsDBNull(Reader("LG_Projects1_ProjectDescription")) Then
+        _LG_Projects1_ProjectDescription = String.Empty
+      Else
+        _LG_Projects1_ProjectDescription = CType(Reader("LG_Projects1_ProjectDescription"), String)
+      End If
+      TranID = CType(Reader("TranID"), String)
+      Shop = CType(Reader("Shop"), String)
+      Ttype = CType(Reader("Ttype"), String)
+      Tissue = CType(Reader("Tissue"), String)
+
     End Sub
     Public Sub New()
     End Sub

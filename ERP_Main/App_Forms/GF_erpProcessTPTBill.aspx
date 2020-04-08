@@ -250,6 +250,13 @@
           </ItemTemplate>
           <HeaderStyle Width="100px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="A">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdAttach" runat="server" AlternateText='<%# Eval("PrimaryKey") %>' ToolTip="Attached Bill." SkinID="attach" OnClientClick='<%# Eval("GetAttachLink") %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="10px" />
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="REC">
           <ItemTemplate>
             <asp:ImageButton ID="cmdApproveWF" ValidationGroup='<%# "Approve" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("ApproveWFVisible") %>' Enabled='<%# EVal("ApproveWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Receive" SkinID="approve" OnClientClick='<%# "return Page_ClientValidate(""Approve" & Container.DataItemIndex & """) && confirm(""Receive record ?"");" %>' CommandName="ApproveWF" CommandArgument='<%# Container.DataItemIndex %>' />
