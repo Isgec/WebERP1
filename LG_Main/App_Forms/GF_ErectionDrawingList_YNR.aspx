@@ -28,11 +28,11 @@
         window.open(url, nam, 'left=20,top=20,width=1000,height=600,toolbar=1,resizable=1,scrollbars=1');
         return false;
        }
-       function script_download(id, dy, id1) {
+      function script_download(id, dy, nid) {
        	pcnt = pcnt + 1;
        	var nam = 'wdwd' + pcnt;
        	var url = self.location.href.replace('App_Forms/GF_ErectionDrawingList_YNR.aspx', 'App_Download/ErectionDocumentList_YNR.aspx');
-       	url = url + '?id=' + $get(id).value + '&dy=' + $get(dy).value;
+       	url = url + '?id=' + $get(id).value + '&dy=' + $get(dy).value + '&nid=' + $get(nid).value;
        	window.open(url, nam, 'left=20,top=20,width=100,height=100,toolbar=1,resizable=1,scrollbars=1');
        	return false;
        }
@@ -52,10 +52,23 @@
 				</td>
 				<td><input type="text" id="F_Days" maxlength="6" style="width: 76px" class="mytxt" value="30" />
 				</td>
+        <tr>
+				<td class="alignright">
+					<b><asp:Label ID="Label1" runat="server" Text="YamunaNagar WorkShop :" /></b>
+				</td>
+				<td>
+					<select id="F_Shop" style="width:80px" >
+						<option value="DRUM" selected="selected">DRUM</option>
+						<option value="PIPE">PIPE</option>
+						<option value="TUBE">TUBE</option>
+						
+					</select>
+				</td>
+			</tr>
       </tr>
       <tr>
 				<td colspan="2" style="text-align:right;">
-					<input type="button" onclick="return script_download('F_ProjectID','F_Days');" value=" Download " />
+					<input type="button" onclick="return script_download('F_ProjectID','F_Days','F_Shop');" value=" Download " />
 				</td>
 			</tr>
     </table>

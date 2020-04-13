@@ -24,10 +24,12 @@ Namespace SIS.LG
 		Private _t_appr As String = ""
     Private _t_adat As String = ""
     Public Property TranID As String = ""
+    Public Property TranID1 As String = ""
     Public Property Shop As String = ""
     Public Property Ttype As String = ""
 
     Public Property Tissue As String = ""
+    Public Property TranState As String = ""
 
     Private _LG_Projects1_ProjectDescription As String = ""
 		Private _FK_tdmisg001200_t_cprj As SIS.LG.lgProjects = Nothing
@@ -133,6 +135,7 @@ Namespace SIS.LG
         _t_cspa = value
       End Set
     End Property
+
     Public Property t_cprj() As String
       Get
         Return _t_cprj
@@ -404,9 +407,11 @@ Namespace SIS.LG
         _LG_Projects1_ProjectDescription = CType(Reader("LG_Projects1_ProjectDescription"), String)
       End If
       TranID = CType(Reader("TranID"), String)
+      TranID1 = CType(Reader("TranID1"), String)
       Shop = CType(Reader("Shop"), String)
       Ttype = CType(Reader("Ttype"), String)
       Tissue = CType(Reader("Tissue"), String)
+      TranState = CType(Reader("TranState"), String)
 
     End Sub
     Public Sub New()

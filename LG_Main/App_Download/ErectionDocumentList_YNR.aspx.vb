@@ -17,12 +17,15 @@ Partial Class ErectionDocumentList_YNR
   Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
     Dim ProjectID As String = ""
     Dim Days As String = ""
+    Dim Shop As String = ""
     Try
       ProjectID = Request.QueryString("id")
       Days = Request.QueryString("dy")
+      Shop = Request.QueryString("nid")
     Catch ex As Exception
       ProjectID = ""
       Days = ""
+      Shop = ""
     End Try
     If ProjectID = String.Empty Then Return
     If Days = String.Empty Then Days = "30"
@@ -32,34 +35,36 @@ Partial Class ErectionDocumentList_YNR
     Catch ex As Exception
       IntDays = 30
     End Try
-    Dim FilePath As String = CreateFile(ProjectID.ToUpper, IntDays)
+
+    Dim FilePath As String = CreateFile(ProjectID.ToUpper, IntDays, Shop)
     Response.ClearContent()
-    Response.AppendHeader("content-disposition", "attachment; filename=" & ProjectID & ".xlsx")
+    Response.AppendHeader("content-disposition", "attachment; filename=" & ProjectID & "_" & Shop & ".xlsx")
     Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(IO.Path.GetFileName(FilePath))
     Response.WriteFile(FilePath)
     Response.End()
   End Sub
-  Private Function CreateFile(ByVal ProjectID As String, ByVal Days As Integer) As String
+  Private Function CreateFile(ByVal ProjectID As String, ByVal Days As Integer, shop As String) As String
     Dim FileName As String = Server.MapPath("~/..") & "App_Temp\" & Guid.NewGuid().ToString()
     IO.File.Copy(Server.MapPath("~/App_Templates") & "\ErectionDocumentTemplate_YNR.xlsx", FileName)
     Dim FileInfo As IO.FileInfo = New IO.FileInfo(FileName)
     Dim xlPk As ExcelPackage = New ExcelPackage(FileInfo)
-    Dim xlWS As ExcelWorksheet = xlPk.Workbook.Worksheets("Released Document List Y")
+    Dim xlWS As ExcelWorksheet = xlPk.Workbook.Worksheets("Total document list")
 
     Dim mPage As Integer = 0
     Dim mSize As Integer = 50
-    Dim oDocs As List(Of SIS.LG.lgDMisg) = SIS.LG.lgDMisg.GetErectionDrawingList_YNR_FromBaaN(mPage, mSize, "", False, "", ProjectID)
+    Dim oDocs As List(Of SIS.LG.lgDMisg) = SIS.LG.lgDMisg.GetErectionDrawingList_YNR_FromBaaN(mPage, mSize, "", False, "", ProjectID, shop)
 
-    Dim r As Integer = 3
+    Dim r As Integer = 7
     Dim c As Integer = 1
     Dim tc As Integer = 10
     With xlWS
+      .Cells(2, 2).Value = ProjectID
+      .Cells(3, 2).Value = shop
+      .Cells(4, 2).Value = Now.ToString("dd/MM/yyyy")
       Do While oDocs.Count > 0
         For Each doc As SIS.LG.lgDMisg In oDocs
-          If r > 3 Then xlWS.InsertRow(r, 1, r + 1)
+          If r > 7 Then xlWS.InsertRow(r, 1, r + 1)
           c = 1
-          .Cells(r, c).Value = doc.t_cprj.Trim
-          c += 1
           .Cells(r, c).Value = doc.t_cspa.Trim
           c += 1
           .Cells(r, c).Value = doc.t_docn.Trim
@@ -82,34 +87,43 @@ Partial Class ErectionDocumentList_YNR
           c += 1
           .Cells(r, c).Value = IIf(doc.t_appr = "1", "YES", "NO")
           c += 1
+          If doc.TranID = "" Then
+            doc.TranID = doc.TranID1
+
+          End If
           .Cells(r, c).Value = doc.TranID
           c += 1
-          .Cells(r, c).Value = doc.Shop
+          .Cells(r, c).Value = doc.TranState
           c += 1
+          If doc.Tissue = "01/01/1970" Then
+            doc.Tissue = "-"
+
+          End If
           .Cells(r, c).Value = doc.Tissue
           c += 1
           .Cells(r, c).Value = doc.Ttype
           r += 1
         Next
         mPage = mPage + mSize
-        oDocs = SIS.LG.lgDMisg.GetErectionDrawingList_YNR_FromBaaN(mPage, mSize, "", False, "", ProjectID)
+        oDocs = SIS.LG.lgDMisg.GetErectionDrawingList_YNR_FromBaaN(mPage, mSize, "", False, "", ProjectID, shop)
       Loop
     End With
 
 
     '2. Sheet For Summary Report
-    xlWS = xlPk.Workbook.Worksheets("Released or Modified Document Y")
-    oDocs = SIS.LG.lgDMisg.GetErectionDrawingList_YNR_FromBaaN_New(Days, ProjectID)
+    xlWS = xlPk.Workbook.Worksheets("Released and modified list")
+    oDocs = SIS.LG.lgDMisg.GetErectionDrawingList_YNR_FromBaaN_New(Days, ProjectID, shop)
 
-    r = 5
+    r = 8
     With xlWS
-      .Cells(2, 3).Value = Now.ToString("dd/MM/yyyy")
-      .Cells(3, 3).Value = Days
+      .Cells(2, 2).Value = ProjectID
+      .Cells(3, 2).Value = shop
+
+      .Cells(4, 2).Value = Now.ToString("dd/MM/yyyy")
+      .Cells(5, 2).Value = Days
       For Each doc As SIS.LG.lgDMisg In oDocs
-        If r > 5 Then xlWS.InsertRow(r, 1, r + 1)
+        If r > 8 Then xlWS.InsertRow(r, 1, r + 1)
         c = 1
-        .Cells(r, c).Value = doc.t_cprj.Trim
-        c += 1
         .Cells(r, c).Value = doc.t_cspa.Trim
         c += 1
         .Cells(r, c).Value = doc.t_docn.Trim
@@ -140,10 +154,18 @@ Partial Class ErectionDocumentList_YNR
         c += 1
         .Cells(r, c).Value = IIf(doc.t_appr = "1", "YES", "NO")
         c += 1
+        If doc.TranID = "" Then
+          doc.TranID = doc.TranID1
+
+        End If
         .Cells(r, c).Value = doc.TranID
         c += 1
-        .Cells(r, c).Value = doc.Shop
+        .Cells(r, c).Value = doc.TranState
         c += 1
+        If doc.Tissue = "01/01/1970" Then
+          doc.Tissue = "-"
+
+        End If
         .Cells(r, c).Value = doc.Tissue
         c += 1
         .Cells(r, c).Value = doc.Ttype

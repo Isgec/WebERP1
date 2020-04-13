@@ -171,8 +171,15 @@ Namespace SIS.LG
       Return Results
     End Function
 
-    Public Shared Function GetErectionDrawingList_YNR_FromBaaN(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal t_cprj As String) As List(Of SIS.LG.lgDMisg)
+    Public Shared Function GetErectionDrawingList_YNR_FromBaaN(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal t_cprj As String, ByVal shop As String) As List(Of SIS.LG.lgDMisg)
       Dim Results As List(Of SIS.LG.lgDMisg) = Nothing
+      Dim Shopelement As String = ""
+      If shop = "DRUM" Then Shopelement = "('50010000', '50010100', '50010300', '50010600', '60101000')"
+      If shop = "PIPE" Then Shopelement = "('50090203', '50991200','50990800','60101000','50090800', '50090401', '50090302', '50090300', '50090202', '50090201', '50090200', '50090101', '50090100', '50090000')"
+      If shop = "TUBE" Then Shopelement = "('50550203', '50990800','60101000','50360400', '50360302', '50360301', '50360300', '50020000', '50020100', '50020200', '50020300', '50020400', '50020500', '50020600', '50360200', '50020900', '50021000', '50030000', '50030100', '50030200', '50030300', '50030400', '50030500', '50030600', '50030700', '50031000', '50031100', '50031200', '50031300', '50031400', '50031500', '50031600', '50032000', '50040000', '50040100', '50040200', '50040300', '50040600', '50040700', '50041000')"
+
+
+
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
@@ -187,6 +194,11 @@ Namespace SIS.LG
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, "")
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
+
+
+
+
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Shopelement", SqlDbType.NVarChar, 500, Shopelement)
           Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
           Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
           _RecordCount = -1
@@ -256,10 +268,15 @@ Namespace SIS.LG
     '  Return Results
     'End Function
 
-    Public Shared Function GetErectionDrawingList_YNR_FromBaaN_New(ByVal LastDays As Integer, ByVal t_cprj As String) As List(Of SIS.LG.lgDMisg)
+    Public Shared Function GetErectionDrawingList_YNR_FromBaaN_New(ByVal LastDays As Integer, ByVal t_cprj As String, ByVal shop As String) As List(Of SIS.LG.lgDMisg)
       Dim Results As List(Of SIS.LG.lgDMisg) = Nothing
+      Dim Shopelement As String = ""
+      If shop = "DRUM" Then Shopelement = "('50010000', '50010100', '50010300', '50010600','60101000')"
+      If shop = "PIPE" Then Shopelement = "('50090203', '50991200','50990800','60101000','50090800', '50090401', '50090302', '50090300', '50090202', '50090201', '50090200', '50090101', '50090100', '50090000')"
+      If shop = "TUBE" Then Shopelement = "('50550203', '50990800','60101000','50360400', '50360302', '50360301', '50360300', '50020000', '50020100', '50020200', '50020300', '50020400', '50020500', '50020600', '50360200', '50020900', '50021000', '50030000', '50030100', '50030200', '50030300', '50030400', '50030500', '50030600', '50030700', '50031000', '50031100', '50031200', '50031300', '50031400', '50031500', '50031600', '50032000', '50040000', '50040100', '50040200', '50040300', '50040600', '50040700', '50041000')"
+
       Dim Sql As String = ""
-      Sql = Sql & "	SELECT     datediff(d,docM.t_drdt,getdate()) as Rele,datediff(d,dcrH.t_appt,getdate()) as UD,  dcrH.t_dcrn , "
+      Sql = Sql & "	Select     datediff(d,docM.t_drdt,getdate()) As Rele,datediff(d,dcrH.t_appt,getdate()) As UD,  dcrH.t_dcrn , "
       Sql = Sql & "	docM.t_docn , docM.t_revn, docM.t_dttl, docM.t_cspa, docM.t_cprj, docM.t_year, docM.t_stat, docM.t_wfst, docM.t_dsca, "
       Sql = Sql & "	docM.t_sorc ,(Case When docM.t_wfst = 5 Then docM.t_drdt Else dcrH.t_appt End) As t_drdt , "
       Sql = Sql & "	docM.t_name ,docM.t_erec ,docM.t_prod ,	docM.t_appr , "
@@ -267,20 +284,29 @@ Namespace SIS.LG
 
       Sql = Sql & "	Case "
 
-      Sql = Sql & "	when docM.t_cspa in ('50010000', '50010100', '50010300', '50010600') then 	'Drum' "
+      Sql = Sql & "	when docM.t_cspa in ('50010000', '50010100', '50010300', '50010600','60101000') then 	'DRUM' "
 
-      Sql = Sql & "	when docM.t_cspa in ('50091200', '50091000', '50090800', '50090700', '50090601', '50090600', '50090500', '50090401', '50090400', '50090302', '50090301', '50090300', '50090202', '50090201', '50090200', '50090101', '50090100', '50090000') then 	'Piping' "
+      Sql = Sql & "	when docM.t_cspa in ('50090203','50991200','50990800','60101000','50090800', '50090401', '50090302', '50090300', '50090202', '50090201', '50090200', '50090101', '50090100', '50090000') then 	'PIPE' "
 
-      Sql = Sql & "	When docM.t_cspa In ('50360400', '50360302', '50360301', '50360300', '50020000', '50020100', '50020200', '50020300', '50020400', '50020500', '50020600', '50360200', '50020900', '50021000', '50030000', '50030100', '50030200', '50030300', '50030400', '50030500', '50030600', '50030700', '50030800', '50030900', '50031000', '50031100', '50031200', '50031300', '50031400', '50031500', '50031600', '50032000', '50040000', '50040100', '50040200', '50040300', '50040400', '50040500', '50040600', '50040700', '50041000')  then 	'Tubes' "
+      Sql = Sql & "	When docM.t_cspa In ('50550203','50990800','60101000','50360400', '50360302', '50360301', '50360300', '50020000', '50020100', '50020200', '50020300', '50020400', '50020500', '50020600', '50360200', '50020900', '50021000', '50030000', '50030100', '50030200', '50030300', '50030400', '50030500', '50030600', '50030700', '50031000', '50031100', '50031200', '50031300', '50031400', '50031500', '50031600', '50032000', '50040000', '50040100', '50040200', '50040300', '50040600', '50040700', '50041000')  then 	'TUBE' "
       Sql = Sql & "	Else '-' "
       Sql = Sql & "	End As Shop, "
 
-      Sql = Sql & "	TraD.t_tran as TranID , TraH.t_isdt as Tissue, "
-      Sql = Sql & "	Case TraH.t_type"
-      Sql = Sql & "	when 1 then 'Customer' "
-      Sql = Sql & "	When 2 Then 'Internal' "
-      Sql = Sql & "	when 3 then 'Site' "
-      Sql = Sql & "	When 4 Then 'Vendor' "
+      Sql = Sql & "	TraH.t_refr as TranID , TraD.t_tran as TranID1 , TraH.t_isdt as Tissue, case TraH.t_stat "
+      Sql = Sql & "	When 1 Then 'Returned' "
+      Sql = Sql & "	When 2 Then 'Free' "
+      Sql = Sql & "	when 3 then 'Under Approval' "
+      Sql = Sql & "	When 4 Then 'Under Issue' "
+      Sql = Sql & "	When 5 Then 'Issued' "
+      Sql = Sql & "	When 6 Then 'Partial Received' "
+      Sql = Sql & "	when 7 then 'Received' "
+      Sql = Sql & "	When 8 Then 'Closed' "
+      Sql = Sql & "	End As TranState, "
+      Sql = Sql & "	Case TraH.t_vadr"
+      Sql = Sql & "	When 'ATRV00003' Then 'Drum Shop' "
+      Sql = Sql & "	When 'ATRV00004' Then 'TMD Shop' "
+      Sql = Sql & "	when 'ATRV00005' then 'Piping Shop' "
+
       Sql = Sql & "	End As Ttype "
       Sql = Sql & "	From tdmisg001200 As docM "
       Sql = Sql & "	Left Join tdmisg115200 as dcrL on (docM.t_docn = dcrL.t_docd And docM.t_revn = dcrL.t_revn) "
@@ -289,12 +315,12 @@ Namespace SIS.LG
       Sql = Sql & "	Left Join tdmisg114200 as dcrH on dcrL.t_dcrn = dcrH.t_dcrn  "
       Sql = Sql & "		WHERE docM.t_revn = (Select MAX(tmp.t_revn) FROM tdmisg001200 As tmp WHERE tmp.t_docn= docM.t_docn) "
       Sql = Sql & "			And docM.t_cprj = '" & t_cprj & "'"
-      Sql = Sql & "			And TraH.t_stat=5 "
-      Sql = Sql & "			And docM.t_cspa in ('50010000', '50010100', '50010300', '50010600','50091200', '50091000', '50090800', '50090700', '50090601', '50090600', '50090500', '50090401', '50090400', '50090302', '50090301', '50090300', '50090202', '50090201', '50090200', '50090101', '50090100', '50090000','50360400', '50360302', '50360301', '50360300', '50020000', '50020100', '50020200', '50020300', '50020400', '50020500', '50020600', '50360200', '50020900', '50021000', '50030000', '50030100', '50030200', '50030300', '50030400', '50030500', '50030600', '50030700', '50030800', '50030900', '50031000', '50031100', '50031200', '50031300', '50031400', '50031500', '50031600', '50032000', '50040000', '50040100', '50040200', '50040300', '50040400', '50040500', '50040600', '50040700', '50041000') "
 
-      Sql = Sql & "			AND (docM.t_wfst = 5 OR docM.t_wfst = 7) "
-      Sql = Sql & "			AND ((docM.t_wfst = 5 and datediff(d,docM.t_drdt,getdate()) <= " & LastDays & ") or (docM.t_wfst=7 and datediff(d,dcrH.t_appt,getdate()) <=" & LastDays & ")  )"
+      Sql = Sql & "			And docM.t_cspa in " & Shopelement & " "
 
+      Sql = Sql & "			And (docM.t_wfst = 5 Or docM.t_wfst = 7) "
+      Sql = Sql & "			And ((docM.t_wfst = 5 And datediff(d,docM.t_drdt,getdate()) <= " & LastDays & ") Or (docM.t_wfst=7 And datediff(d,dcrH.t_appt,getdate()) <=" & LastDays & ")  )"
+      Sql = Sql & "			And (TraH.t_type Not In ('1','2','3') or TraH.t_type is null)"
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.Text
