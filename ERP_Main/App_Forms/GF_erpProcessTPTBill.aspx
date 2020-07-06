@@ -278,6 +278,13 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle Width="30px" CssClass="alignCenter" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="Unlock">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdUnlock" runat="server" Visible='<%# Eval("UnlockWFVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Unlock for attaching detention bill" SkinID="unlock" OnClientClick="return confirm('Unlock for attaching detention bill by logistics?');" CommandName="UnlockWF" CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="30px" CssClass="alignCenter" />
+        </asp:TemplateField>
       </Columns>
       <EmptyDataTemplate>
         <asp:Label ID="LabelEmpty" runat="server" Font-Size="Small" ForeColor="Red" Text="No record found !!!"></asp:Label>

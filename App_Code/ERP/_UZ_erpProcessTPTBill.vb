@@ -74,17 +74,44 @@ Namespace SIS.ERP
         Return mRet
       End Get
     End Property
-    Public Shared Shadows Function ApproveWF(ByVal SerialNo As Int32) As SIS.ERP.erpProcessTPTBill
-			Dim Results As SIS.ERP.erpProcessTPTBill = erpProcessTPTBillGetByID(SerialNo)
-			With Results
-				.RECDByAccountsOn = Now
-				.RECDinAccountsBy = HttpContext.Current.Session("LoginID")
-				.BillStatus = TptBillStatus.UnderPaymentProcessing
-			End With
-			SIS.ERP.erpCreateTPTBill.UpdateData(Results)
+    Public Shadows ReadOnly Property UnlockWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          Select Case BillStatus
+            Case TptBillStatus.PaymentProcessed, TptBillStatus.Closed
+              If Not Unlocked AndAlso BillType = "Freight Bill" AndAlso ClubbingNo = "" Then 'AndAlso RecordType = "Freight" may not be there
+                mRet = True
+              End If
+          End Select
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public Shared Shadows Function UnlockWF(ByVal SerialNo As Int32) As SIS.ERP.erpProcessTPTBill
+      Dim Results As SIS.ERP.erpProcessTPTBill = erpProcessTPTBillGetByID(SerialNo)
+      With Results
+        .Unlocked = True
+        .UnlockedOn = Now
+        .UnlockedBy = HttpContext.Current.Session("LoginID")
+        .RecordType = "Frieght"
+      End With
+      SIS.ERP.erpCreateTPTBill.UpdateData(Results)
       Return Results
     End Function
-		Public Shared Shadows Function RejectWF(ByVal SerialNo As Int32, Optional ByVal Remarks As String = "") As SIS.ERP.erpProcessTPTBill
+
+    Public Shared Shadows Function ApproveWF(ByVal SerialNo As Int32) As SIS.ERP.erpProcessTPTBill
+      Dim Results As SIS.ERP.erpProcessTPTBill = erpProcessTPTBillGetByID(SerialNo)
+      With Results
+        .RECDByAccountsOn = Now
+        .RECDinAccountsBy = HttpContext.Current.Session("LoginID")
+        .BillStatus = TptBillStatus.UnderPaymentProcessing
+      End With
+      SIS.ERP.erpCreateTPTBill.UpdateData(Results)
+      Return Results
+    End Function
+    Public Shared Shadows Function RejectWF(ByVal SerialNo As Int32, Optional ByVal Remarks As String = "") As SIS.ERP.erpProcessTPTBill
 			Dim Results As SIS.ERP.erpProcessTPTBill = erpProcessTPTBillGetByID(SerialNo)
 			If Remarks = String.Empty Then
 				If Results.AccountsRemarks = String.Empty Then Throw New Exception("Remarks is required when returning document.")

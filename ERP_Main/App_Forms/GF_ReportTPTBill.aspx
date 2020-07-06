@@ -1,10 +1,17 @@
 <%@ Page Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" CodeFile="GF_ReportTPTBill.aspx.vb" Inherits="GF_ReportTPTBill" title="Transporter Bill Report" %>
 <asp:Content ID="CPHlgDMisg" ContentPlaceHolderID="cph1" Runat="Server">
-<div id="div1" class="page">
+<div class="ui-widget-content page">
+<div class="caption">
+    <asp:Label ID="LabellgDMisg" runat="server" Text="&nbsp;Report: Transporter Bill" Width="100%" CssClass="sis_formheading"></asp:Label>
+</div>
+<div class="pagedata">
 <asp:UpdatePanel ID="UPNLlgDMisg" runat="server">
   <ContentTemplate>
-    <asp:Label ID="LabellgDMisg" runat="server" Text="&nbsp;Report: Transporter Bill" Width="100%" CssClass="sis_formheading"></asp:Label>
-    <table width="100%"><tr><td class="sis_formview"> 
+    <table style="width:100%;"><tr><td class="sis_formview"> 
+    <LGM:ToolBar0 
+      ID = "TBLerpCreateTPTBill"
+      ToolType="lgNReport"
+      runat = "server" />
     <asp:UpdateProgress ID="UPGSlgDMisg" runat="server" AssociatedUpdatePanelID="UPNLlgDMisg" DisplayAfter="100">
       <ProgressTemplate>
         <span style="color: #ff0033">Loading...</span>
@@ -31,6 +38,18 @@
     </script>
     <br />
     <br />
+      <table>
+        <tr>
+          <td style="width:350px;background-color:lightgray;">
+            <asp:Label ID="Label3" runat="server" Font-Bold="true" Font-Size="14px" Text="1. Print Transporter Bills"></asp:Label>
+          </td> 
+          <td style="width:350px;background-color:lightgray">
+            <asp:Label ID="Label4" runat="server" Font-Bold="true" Font-Size="14px" Text="2. Print Weight Card"></asp:Label>
+
+          </td> 
+        </tr>
+        <tr>
+          <td>
     <table>
 			<tr>
 				<td class="alignright">
@@ -138,13 +157,46 @@
 					</td>
 				</tr>
 				<tr>
-				<td colspan="2">
+				<td colspan="2" style="text-align:right;">
 					<input type="button" onclick="return script_download('<%= F_FromDate.ClientID %>','<%= F_ToDate.ClientID %>','<%= F_BillStatus.LCClientID %>');" value=" Download " />
 				</td>
 			</tr>
     </table>
+          </td>
+          <td>
+    <table>
+			<tr>
+				<td class="alignright">
+					<b><asp:Label ID="Label2" runat="server" Text="PO Number :" /></b>
+				</td>
+				<td>
+					<asp:TextBox ID="F_PONumber"
+            Width="100px"
+						CssClass = "mytxt"
+						onfocus = "return this.select();"
+						ValidationGroup="POCard"
+            MaxLength="9"
+						runat="server" />
+				</td>
+			</tr>
+				<tr>
+				<td colspan="2" style="text-align:right;">
+          <asp:Button id="PrintPOCard" runat="server" Text="Print Weight Card" ValidationGroup="POCard" />
+				</td>
+			</tr>
+    </table>
+
+          </td>
+        </tr>
+      </table>
+
+
   </td></tr></table>
   </ContentTemplate>
+  <Triggers>
+    <asp:PostBackTrigger ControlID="PrintPOCard" />
+  </Triggers>
 </asp:UpdatePanel>
 </div>
+  </div>
 </asp:Content>

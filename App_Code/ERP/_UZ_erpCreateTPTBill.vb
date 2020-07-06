@@ -196,6 +196,9 @@ Namespace SIS.ERP
         Case TptBillStatus.Closed
           mRet = Drawing.Color.DarkGoldenrod
       End Select
+      If Unlocked Then
+        mRet = Drawing.Color.Red
+      End If
       Return mRet
     End Function
     Public Function GetVisible() As Boolean
@@ -451,6 +454,56 @@ Namespace SIS.ERP
       End Using
       Return mRet
     End Function
+    Public Shared Function UZ_erpCreateTPTBillUpdateUnlocked(ByVal Record As SIS.ERP.erpCreateTPTBill) As SIS.ERP.erpCreateTPTBill
+      Dim ClubNo As String = ""
+      ClubNo = GetNextClubNo()
+      Dim frt As SIS.ERP.erpCreateTPTBill = SIS.ERP.erpCreateTPTBill.erpCreateTPTBillGetByID(Record.SerialNo)
+      With frt
+        .ClubbingNo = ClubNo
+        .Unlocked = False
+        .RecordType = "Freight"
+        .BillType = "Freight And Detention Separate Bills"
+      End With
+      Dim dRecord As New SIS.ERP.erpCreateTPTBill
+      With dRecord
+        .ClubbingNo = ClubNo
+        .BillStatus = 2
+        .CreatedBy = Global.System.Web.HttpContext.Current.Session("LoginID")
+        .CreatedOn = Now
+        .BillType = frt.BillType
+        .RecordType = "Detention"
+        .[TPTBillNo] = Record.dTPTBillNo
+        .[IRNumber] = Record.dIRNumber
+        .[TPTBillDate] = Record.dTPTBillDate
+        .[TPTBillReceivedOn] = Record.dTPTBillReceivedOn
+        .[GRNos] = Record.GRNos
+        .[TPTCode] = Record.TPTCode
+        .[PONumber] = Record.PONumber
+        .[ProjectID] = Record.ProjectID
+        .[TPTBillAmount] = Record.dTPTBillAmount
+        .[DetentionatLP] = Record.dDetentionatLP
+        .[DetentionatULP] = Record.dDetentionatULP
+        .DetentionatDaysLP = Record.dDetentionatDaysLP
+        .LPisISGECWorks = Record.dLPisISGECWorks
+        .DetentionatDaysULP = Record.dDetentionatDaysULP
+        .ULPisICDCFSPort = Record.dULPisICDCFSPort
+        .AssessableValue = Record.dAssessableValue
+        .IGSTRate = Record.dIGSTRate
+        .IGSTAmount = Record.dIGSTAmount
+        .SGSTRate = Record.dSGSTRate
+        .SGSTAmount = Record.dSGSTAmount
+        .CGSTRate = Record.dCGSTRate
+        .CGSTAmount = Record.dCGSTAmount
+        .CessRate = Record.dCessRate
+        .CessAmount = Record.dCessAmount
+        .TotalGST = Record.dTotalGST
+        .TotalAmount = Record.dTotalAmount
+      End With
+      dRecord = InsertData(dRecord)
+      frt = UpdateData(frt)
+      Return dRecord
+    End Function
+
     Public Shared Function UZ_erpCreateTPTBillUpdate(ByVal Record As SIS.ERP.erpCreateTPTBill) As SIS.ERP.erpCreateTPTBill
       Dim _Result As SIS.ERP.erpCreateTPTBill = erpCreateTPTBillUpdate(Record)
       Return _Result
@@ -488,7 +541,8 @@ Namespace SIS.ERP
       Sql = Sql & "gst.t_cmnt as CessAmount, "
       Sql = Sql & "gst.t_tgmt as TotalGST, "
       Sql = Sql & "gst.t_tval as TotalAmount, "
-      Sql = Sql & "gr.t_grno as GRNOs "
+      Sql = Sql & "gr.t_grno as GRNOs, "
+      Sql = Sql & "gr.t_grdt as GRDTs "
       Sql = Sql & "from ttfacp100200 as ir "
       Sql = Sql & "left outer join ttfisg407200 as gst on ir.t_ninv = gst.t_ninv and gst.t_pono=1 "
       Sql = Sql & "left outer join ttfisg002200 as gr on ir.t_ninv = gr.t_irno "
@@ -501,8 +555,9 @@ Namespace SIS.ERP
           Dim Reader As SqlDataReader = Cmd.ExecuteReader()
           If Reader.Read() Then
             Results = New SIS.ERP.erpCreateTPTBill(Reader)
+            Results.GRNos = Results.GRNos & " Dt " & Reader("GRDTs")
             While (Reader.Read())
-              Results.GRNos = Results.GRNos & ", " & Reader("GRNos")
+              Results.GRNos = Results.GRNos & ", " & Reader("GRNos") & " Dt " & Reader("GRDTs")
             End While
           End If
           Reader.Close()
@@ -510,32 +565,32 @@ Namespace SIS.ERP
       End Using
       Return Results
     End Function
-    Public Shared Function getStrIRData(ByVal oTptBill As SIS.ERP.erpCreateTPTBill) As String
-      Dim mRet As String = ""
-      If oTptBill Is Nothing Then Return mRet
-      With oTptBill
-        mRet &= "|" & .TPTBillNo
-        mRet &= "|" & .TPTBillDate
-        mRet &= "|" & .GRNos
-        mRet &= "|" & .TPTCode
-        mRet &= "|" & .PONumber
-        mRet &= "|" & .ProjectID
-        mRet &= "|" & .TPTBillAmount
-        mRet &= "|" & .TPTBillReceivedOn
-        mRet &= "|" & .AssessableValue
-        mRet &= "|" & .IGSTRate
-        mRet &= "|" & .IGSTAmount
-        mRet &= "|" & .CGSTRate
-        mRet &= "|" & .CGSTAmount
-        mRet &= "|" & .SGSTRate
-        mRet &= "|" & .SGSTAmount
-        mRet &= "|" & .CessRate
-        mRet &= "|" & .CessAmount
-        mRet &= "|" & .TotalGST
-        mRet &= "|" & .TotalAmount
-      End With
-      Return mRet
-    End Function
+    'Public Shared Function getStrIRData(ByVal oTptBill As SIS.ERP.erpCreateTPTBill) As String
+    '  Dim mRet As String = ""
+    '  If oTptBill Is Nothing Then Return mRet
+    '  With oTptBill
+    '    mRet &= "|" & .TPTBillNo
+    '    mRet &= "|" & .TPTBillDate
+    '    mRet &= "|" & .GRNos
+    '    mRet &= "|" & .TPTCode
+    '    mRet &= "|" & .PONumber
+    '    mRet &= "|" & .ProjectID
+    '    mRet &= "|" & .TPTBillAmount
+    '    mRet &= "|" & .TPTBillReceivedOn
+    '    mRet &= "|" & .AssessableValue
+    '    mRet &= "|" & .IGSTRate
+    '    mRet &= "|" & .IGSTAmount
+    '    mRet &= "|" & .CGSTRate
+    '    mRet &= "|" & .CGSTAmount
+    '    mRet &= "|" & .SGSTRate
+    '    mRet &= "|" & .SGSTAmount
+    '    mRet &= "|" & .CessRate
+    '    mRet &= "|" & .CessAmount
+    '    mRet &= "|" & .TotalGST
+    '    mRet &= "|" & .TotalAmount
+    '  End With
+    '  Return mRet
+    'End Function
     Public Shared Function GetByReceiptDate(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal FromDate As String, ByVal ToDate As String, ByVal StatusID As String) As List(Of SIS.ERP.erpCreateTPTBill)
       Dim Results As List(Of SIS.ERP.erpCreateTPTBill) = Nothing
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())

@@ -1,3 +1,4 @@
+Imports System.Web.Script.Serialization
 Partial Class EF_erpCreateTPTBill
   Inherits SIS.SYS.UpdateBase
   Public Property Editable() As Boolean
@@ -79,7 +80,7 @@ Partial Class EF_erpCreateTPTBill
       Page.ClientScript.RegisterClientScriptBlock(GetType(System.String), "scripterpCreateTPTBill", mStr)
     End If
     TBLerpCreateTPTBill.EnableSave = Editable
-    TBLerpCreateTPTBill.EnableDelete = False
+    TBLerpCreateTPTBill.EnableDelete = BillFree
     Dim oCtl As TextBox = Nothing
     Dim oChk As CheckBox = Nothing
     Select Case oTmp.BillType
@@ -241,57 +242,57 @@ Partial Class EF_erpCreateTPTBill
     End Select
 
   End Sub
-  <System.Web.Services.WebMethod()> _
-	<System.Web.Script.Services.ScriptMethod()> _
+  <System.Web.Services.WebMethod()>
+  <System.Web.Script.Services.ScriptMethod()>
   Public Shared Function TPTCodeCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
     Return SIS.VR.vrTransporters.SelectvrTransportersAutoCompleteList(prefixText, count, contextKey)
   End Function
-	<System.Web.Services.WebMethod()> _
-	<System.Web.Script.Services.ScriptMethod()> _
+  <System.Web.Services.WebMethod()>
+  <System.Web.Script.Services.ScriptMethod()>
   Public Shared Function ProjectIDCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
     Return SIS.QCM.qcmProjects.SelectqcmProjectsAutoCompleteList(prefixText, count, contextKey)
   End Function
-	<System.Web.Services.WebMethod()> _
-	<System.Web.Script.Services.ScriptMethod()> _
+  <System.Web.Services.WebMethod()>
+  <System.Web.Script.Services.ScriptMethod()>
   Public Shared Function DiscReturnedToByACCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
     Return SIS.QCM.qcmUsers.SelectqcmUsersAutoCompleteList(prefixText, count, contextKey)
   End Function
-	<System.Web.Services.WebMethod()> _
+  <System.Web.Services.WebMethod()>
   Public Shared Function validate_FK_ERP_TransporterBill_DiscReturnedToByAc(ByVal value As String) As String
     Dim aVal() As String = value.Split(",".ToCharArray)
-    Dim mRet As String="0|" & aVal(0)
-		Dim DiscReturnedToByAC As String = CType(aVal(1),String)
-		Dim oVar As SIS.QCM.qcmUsers = SIS.QCM.qcmUsers.qcmUsersGetByID(DiscReturnedToByAC)
+    Dim mRet As String = "0|" & aVal(0)
+    Dim DiscReturnedToByAC As String = CType(aVal(1), String)
+    Dim oVar As SIS.QCM.qcmUsers = SIS.QCM.qcmUsers.qcmUsersGetByID(DiscReturnedToByAC)
     If oVar Is Nothing Then
-			mRet = "1|" & aVal(0) & "|Record not found." 
+      mRet = "1|" & aVal(0) & "|Record not found."
     Else
-			mRet = "0|" & aVal(0) & "|" & oVar.DisplayField 
+      mRet = "0|" & aVal(0) & "|" & oVar.DisplayField
     End If
     Return mRet
   End Function
-	<System.Web.Services.WebMethod()> _
+  <System.Web.Services.WebMethod()>
   Public Shared Function validate_FK_ERP_TransporterBill_ProjectID(ByVal value As String) As String
     Dim aVal() As String = value.Split(",".ToCharArray)
-    Dim mRet As String="0|" & aVal(0)
-		Dim ProjectID As String = CType(aVal(1),String)
-		Dim oVar As SIS.QCM.qcmProjects = SIS.QCM.qcmProjects.qcmProjectsGetByID(ProjectID)
+    Dim mRet As String = "0|" & aVal(0)
+    Dim ProjectID As String = CType(aVal(1), String)
+    Dim oVar As SIS.QCM.qcmProjects = SIS.QCM.qcmProjects.qcmProjectsGetByID(ProjectID)
     If oVar Is Nothing Then
-			mRet = "1|" & aVal(0) & "|Record not found." 
+      mRet = "1|" & aVal(0) & "|Record not found."
     Else
-			mRet = "0|" & aVal(0) & "|" & oVar.DisplayField 
+      mRet = "0|" & aVal(0) & "|" & oVar.DisplayField
     End If
     Return mRet
   End Function
-	<System.Web.Services.WebMethod()> _
+  <System.Web.Services.WebMethod()>
   Public Shared Function validate_FK_ERP_TransporterBill_TPTCode(ByVal value As String) As String
     Dim aVal() As String = value.Split(",".ToCharArray)
-    Dim mRet As String="0|" & aVal(0)
-		Dim TPTCode As String = CType(aVal(1),String)
-		Dim oVar As SIS.VR.vrTransporters = SIS.VR.vrTransporters.vrTransportersGetByID(TPTCode)
+    Dim mRet As String = "0|" & aVal(0)
+    Dim TPTCode As String = CType(aVal(1), String)
+    Dim oVar As SIS.VR.vrTransporters = SIS.VR.vrTransporters.vrTransportersGetByID(TPTCode)
     If oVar Is Nothing Then
-			mRet = "1|" & aVal(0) & "|Record not found." 
+      mRet = "1|" & aVal(0) & "|Record not found."
     Else
-			mRet = "0|" & aVal(0) & "|" & oVar.DisplayField 
+      mRet = "0|" & aVal(0) & "|" & oVar.DisplayField
     End If
     Return mRet
   End Function
@@ -300,31 +301,59 @@ Partial Class EF_erpCreateTPTBill
   Public Shared Function CreatedByCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
     Return SIS.QCM.qcmUsers.SelectqcmUsersAutoCompleteList(prefixText, count, contextKey)
   End Function
-  <System.Web.Services.WebMethod()> _
-	 Public Shared Function validate_FK_ERP_TransporterBill_CreatedBy(ByVal value As String) As String
-		Dim aVal() As String = value.Split(",".ToCharArray)
-		Dim mRet As String = "0|" & aVal(0)
-		Dim CreatedBy As String = CType(aVal(1), String)
-		Dim oVar As SIS.QCM.qcmUsers = SIS.QCM.qcmUsers.qcmUsersGetByID(CreatedBy)
-		If oVar Is Nothing Then
-			mRet = "1|" & aVal(0) & "|Record not found."
-		Else
-			mRet = "0|" & aVal(0) & "|" & oVar.DisplayField
-		End If
-		Return mRet
-	End Function
-	<System.Web.Services.WebMethod()> _
-	 Public Shared Function getIRData(ByVal value As String) As String
+  <System.Web.Services.WebMethod()>
+  Public Shared Function validate_FK_ERP_TransporterBill_CreatedBy(ByVal value As String) As String
+    Dim aVal() As String = value.Split(",".ToCharArray)
+    Dim mRet As String = "0|" & aVal(0)
+    Dim CreatedBy As String = CType(aVal(1), String)
+    Dim oVar As SIS.QCM.qcmUsers = SIS.QCM.qcmUsers.qcmUsersGetByID(CreatedBy)
+    If oVar Is Nothing Then
+      mRet = "1|" & aVal(0) & "|Record not found."
+    Else
+      mRet = "0|" & aVal(0) & "|" & oVar.DisplayField
+    End If
+    Return mRet
+  End Function
+  <System.Web.Services.WebMethod()>
+  Public Shared Function getIRData(ByVal value As String) As String
     Dim aVal() As String = value.Split(",".ToCharArray)
     Dim IRNo As String = aVal(1)
     Dim tmp As SIS.ERP.erpCreateTPTBill = Nothing
     Dim mRet As String = "0|" & aVal(0)
     Try
       tmp = SIS.ERP.erpCreateTPTBill.getIRData(IRNo)
-      mRet = "0|" & aVal(0) & "|" & SIS.ERP.erpCreateTPTBill.getStrIRData(tmp)
-      tmp.ErrMessage = "0|" & aVal(0)
+      mRet = New JavaScriptSerializer().Serialize(New With {
+        .err = False,
+        .msg = "",
+        .tgt = aVal(0),
+        .irdata = New With {
+          .TPTBillNo = tmp.TPTBillNo,
+          .TPTBillDate = tmp.TPTBillDate,
+          .GRNos = tmp.GRNos,
+          .TPTCode = tmp.TPTCode,
+          .PONumber = tmp.PONumber,
+          .ProjectID = tmp.ProjectID,
+          .TPTBillAmount = tmp.TPTBillAmount,
+          .TPTBillReceivedOn = tmp.TPTBillReceivedOn,
+          .AssessableValue = tmp.AssessableValue,
+          .IGSTRate = tmp.IGSTRate,
+          .IGSTAmount = tmp.IGSTAmount,
+          .CGSTRate = tmp.CGSTRate,
+          .CGSTAmount = tmp.CGSTAmount,
+          .SGSTRate = tmp.SGSTRate,
+          .SGSTAmount = tmp.SGSTAmount,
+          .CessRate = tmp.CessRate,
+          .CessAmount = tmp.CessAmount,
+          .TotalGST = tmp.TotalGST,
+          .TotalAmount = tmp.TotalAmount
+          }
+        })
     Catch ex As Exception
-      mRet = "1|" & aVal(0) & "|" & ex.Message
+      mRet = New JavaScriptSerializer().Serialize(New With {
+        .err = True,
+        .msg = ex.Message,
+        .tgt = aVal(0)
+        })
     End Try
     Return mRet
   End Function

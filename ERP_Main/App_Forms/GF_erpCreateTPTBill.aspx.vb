@@ -21,20 +21,20 @@ Partial Class GF_erpCreateTPTBill
 					.CreatedBy = oCT.CreatedBy
 					.CreatedOn = ""
 					.GRNos = ""
-					.TPTCode = oCT.TPTCode
-					.PONumber = oCT.PONumber
-					.ProjectID = oCT.ProjectID
-					.TPTBillAmount = 0
-					.BasicFreightValue = 0
-					.BasicFvODC = 0
-					.DetentionatLP = 0
-					.DetentionatULP = 0
-					.ODCChargesInContract = 0
-					.ODCChargesOutOfContract = 0
-					.EmptyReturnCharges = 0
-					.RTOChallanAmount = 0
-					.OtherAmount = 0
-					.ServiceTax = 0
+          .TPTCode = oCT.TPTCode
+          .PONumber = oCT.PONumber
+          .ProjectID = oCT.ProjectID
+          .TPTBillAmount = 0
+          .BasicFreightValue = 0
+          .BasicFvODC = 0
+          .DetentionatLP = 0
+          .DetentionatULP = 0
+          .ODCChargesInContract = 0
+          .ODCChargesOutOfContract = 0
+          .EmptyReturnCharges = 0
+          .RTOChallanAmount = 0
+          .OtherAmount = 0
+          .ServiceTax = 0
 					.TotalBillPassedAmount = 0
 					.DiscReturnedToByAC = oCT.DiscReturnedToByAC
 					.ChequeNo = ""
@@ -56,8 +56,11 @@ Partial Class GF_erpCreateTPTBill
 					.BankVCHNo = ""
 					.BankVCHAmount = ""
 					.BankVCHDate = ""
-					.AccountsRemarks = ""
-				End With
+          .AccountsRemarks = ""
+          .Unlocked = False
+          .UnlockedBy = ""
+          .UnlockedOn = ""
+        End With
 				oCT = SIS.ERP.erpCreateTPTBill.InsertData(oCT)
 				SerialNo = oCT.SerialNo
 				Dim RedirectUrl As String = TBLerpCreateTPTBill.EditUrl & "?SerialNo=" & SerialNo
@@ -67,10 +70,14 @@ Partial Class GF_erpCreateTPTBill
 		End If
 		If e.CommandName.ToLower = "lgedit".ToLower Then
 			Try
-				Dim SerialNo As Int32 = GVerpCreateTPTBill.DataKeys(e.CommandArgument).Values("SerialNo")
-				Dim RedirectUrl As String = TBLerpCreateTPTBill.EditUrl & "?SerialNo=" & SerialNo
-				Response.Redirect(RedirectUrl)
-			Catch ex As Exception
+        Dim SerialNo As Int32 = GVerpCreateTPTBill.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim tBill As SIS.ERP.erpCreateTPTBill = SIS.ERP.erpCreateTPTBill.erpCreateTPTBillGetByID(SerialNo)
+        Dim RedirectUrl As String = TBLerpCreateTPTBill.EditUrl & "?SerialNo=" & SerialNo
+        If tBill.Unlocked Then
+          RedirectUrl = "~/ERP_Main/App_Edit/x/EF_erpCreateTPTBill.aspx" & "?SerialNo=" & SerialNo
+        End If
+        Response.Redirect(RedirectUrl)
+      Catch ex As Exception
 			End Try
 		End If
 		If e.CommandName.ToLower = "initiatewf".ToLower Then

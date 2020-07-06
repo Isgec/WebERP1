@@ -111,6 +111,9 @@ Namespace SIS.ERP
     Public Property dTotalGST As String = "0.00"
     Public Property dTotalAmount As String = "0.00"
 
+    Public Property Unlocked As Boolean = False
+    Public Property UnlockedBy As String = ""
+    Public Property UnlockedOn As String = ""
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -1062,6 +1065,9 @@ Namespace SIS.ERP
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalGST", SqlDbType.Decimal, 23, IIf(Record.TotalGST = "", Convert.DBNull, Record.TotalGST))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalAmount", SqlDbType.Decimal, 23, IIf(Record.TotalAmount = "", Convert.DBNull, Record.TotalAmount))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RecordType", SqlDbType.NVarChar, 50, IIf(Record.RecordType = "", Convert.DBNull, Record.RecordType))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Unlocked", SqlDbType.Bit, 1, Record.Unlocked)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@UnlockedBy", SqlDbType.NVarChar, 9, IIf(Record.UnlockedBy = "", Convert.DBNull, Record.UnlockedBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@UnlockedOn", SqlDbType.DateTime, 21, IIf(Record.UnlockedOn = "", Convert.DBNull, Record.UnlockedOn))
           Cmd.Parameters.Add("@Return_SerialNo", SqlDbType.Int, 11)
           Cmd.Parameters("@Return_SerialNo").Direction = ParameterDirection.Output
           Con.Open()
@@ -1182,6 +1188,9 @@ Namespace SIS.ERP
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalGST", SqlDbType.Decimal, 23, IIf(Record.TotalGST = "", Convert.DBNull, Record.TotalGST))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalAmount", SqlDbType.Decimal, 23, IIf(Record.TotalAmount = "", Convert.DBNull, Record.TotalAmount))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RecordType", SqlDbType.NVarChar, 50, IIf(Record.RecordType = "", Convert.DBNull, Record.RecordType))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Unlocked", SqlDbType.Bit, 1, Record.Unlocked)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@UnlockedBy", SqlDbType.NVarChar, 9, IIf(Record.UnlockedBy = "", Convert.DBNull, Record.UnlockedBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@UnlockedOn", SqlDbType.DateTime, 21, IIf(Record.UnlockedOn = "", Convert.DBNull, Record.UnlockedOn))
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1

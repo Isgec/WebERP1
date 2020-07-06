@@ -11,7 +11,30 @@ var script_erpCreateTPTBill = {
 		  IRNo.style.backgroundPosition = 'right';
 		  PageMethods.getIRData(value, this.IRData);
 		},
-		IRData: function(result) {
+		IRData: function(r){
+		  var v=JSON.parse(r);
+		  var x = $get(v.tgt);
+		  x.style.backgroundImage  = 'none';
+		  if(v.err){
+		    alert(v.msg);
+		    x.value='';
+		    x.focus();
+		  }else{
+		    var z;
+		    z = v.irdata;
+		    if (typeof(z) == 'object') {
+		      try { $get('F_TPTBillNo').value = z.TPTBillNo; } catch (ex) { }
+		      try { $get('F_TPTBillDate').value = z.TPTBillDate; } catch (ex) { }
+		      try { $get('F_GRNos').value = z.GRNos; } catch (ex) { }
+		      try { $get('F_TPTCode').value = z.TPTCode; } catch (ex) { }
+		      try { $get('F_PONumber').value = z.PONumber; } catch (ex) { }
+		      try { $get('F_ProjectID').value = z.ProjectID; } catch (ex) { }
+		      try { $get('F_TPTBillAmount').value = z.TPTBillAmount; } catch (ex) { }
+		      try { $get('F_TPTBillReceivedOn').value = z.TPTBillReceivedOn; } catch (ex) { }
+		    }
+		  }
+		},
+		xIRData: function(result) {
 		  var p = result.split('|');
 		  var o = $get(p[1]);
 		  o.style.backgroundImage  = 'none';

@@ -11,7 +11,32 @@ var script_erpCreateTPTBill = {
 		  IRNo.style.backgroundPosition = 'right';
 		  PageMethods.getIRData(value, this.IRData);
 		},
-		IRData: function(result) {
+		IRData: function(r){
+		  var v=JSON.parse(r);
+		  var x = $get(v.tgt);
+		  x.style.backgroundImage  = 'none';
+		  if(v.err){
+		    alert(v.msg);
+		    x.value='';
+		    x.focus();
+		  }else{
+		    var pf=v.tgt.substring(0,2);
+		    var objVal;
+		    objVal = v.irdata;
+		    if (typeof(objVal) == 'object') {
+		      var aProp = Object.keys(objVal);
+		      for (i = 0; i < aProp.length; i++) {
+		        try {
+		          $get(pf + aProp[i]).value = objVal[aProp[i]];
+		        } catch (e) { }
+		      }
+		      if (pf=='F_')
+		        try { $get('D_GRNos').value = objVal.GRNos; } catch (ex) { }
+		    }
+
+		  }
+		},
+		xIRData: function(result) {
 		  var p = result.split('|');
 		  var o = $get(p[1]);
 		  o.style.backgroundImage  = 'none';

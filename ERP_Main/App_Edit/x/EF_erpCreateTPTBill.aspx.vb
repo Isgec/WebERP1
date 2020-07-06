@@ -1,52 +1,41 @@
 Imports System.Web.Script.Serialization
-Partial Class AF_erpCreateTPTBill
-  Inherits SIS.SYS.InsertBase
+Partial Class EF_erpCreateTPTBillx
+  Inherits SIS.SYS.UpdateBase
+
+
+  Public Property PrimaryKey() As String
+    Get
+      If ViewState("PrimaryKey") IsNot Nothing Then
+        Return CType(ViewState("PrimaryKey"), String)
+      End If
+      Return True
+    End Get
+    Set(ByVal value As String)
+      ViewState.Add("PrimaryKey", value)
+    End Set
+  End Property
+  Dim oTmp As SIS.ERP.erpCreateTPTBill = Nothing
+  Protected Sub ODSerpCreateTPTBill_Selected(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.ObjectDataSourceStatusEventArgs) Handles ODSerpCreateTPTBill.Selected
+    oTmp = CType(e.ReturnValue, SIS.ERP.erpCreateTPTBill)
+    PrimaryKey = oTmp.PrimaryKey
+  End Sub
   Protected Sub FVerpCreateTPTBill_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles FVerpCreateTPTBill.Init
-    DataClassName = "AerpCreateTPTBill"
+    DataClassName = "EerpCreateTPTBill"
     SetFormView = FVerpCreateTPTBill
   End Sub
   Protected Sub TBLerpCreateTPTBill_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles TBLerpCreateTPTBill.Init
     SetToolBar = TBLerpCreateTPTBill
   End Sub
   Protected Sub FVerpCreateTPTBill_PreRender(ByVal sender As Object, ByVal e As System.EventArgs) Handles FVerpCreateTPTBill.PreRender
-    Dim BillType As String = CType(FVerpCreateTPTBill.FindControl("F_BillType"), DropDownList).SelectedValue
+    TBLerpCreateTPTBill.EnableDelete = False
+    Dim BillType As String = "Freight And Detention Separate Bills"
     Select Case BillType
-      Case ""
-        FVerpCreateTPTBill.FindControl("trDet7").Visible = False
-        FVerpCreateTPTBill.FindControl("tblFreight").Visible = False
-        FVerpCreateTPTBill.FindControl("tblDetention").Visible = False
-      Case "Freight Bill"
-        FVerpCreateTPTBill.FindControl("trDet7").Visible = False
-        FVerpCreateTPTBill.FindControl("tblFreight").Visible = True
-        FVerpCreateTPTBill.FindControl("trDet1").Visible = False
-        FVerpCreateTPTBill.FindControl("trDet2").Visible = False
-        FVerpCreateTPTBill.FindControl("trDet3").Visible = False
-        FVerpCreateTPTBill.FindControl("trDet4").Visible = False
-        FVerpCreateTPTBill.FindControl("trDet5").Visible = False
-        FVerpCreateTPTBill.FindControl("trDet6").Visible = False
-        FVerpCreateTPTBill.FindControl("tblDetention").Visible = False
-      Case "Freight Bill With Detention"
-        FVerpCreateTPTBill.FindControl("trDet7").Visible = False
-        FVerpCreateTPTBill.FindControl("tblFreight").Visible = True
-        FVerpCreateTPTBill.FindControl("trDet1").Visible = True
-        FVerpCreateTPTBill.FindControl("trDet2").Visible = True
-        FVerpCreateTPTBill.FindControl("trDet3").Visible = True
-        FVerpCreateTPTBill.FindControl("trDet4").Visible = True
-        FVerpCreateTPTBill.FindControl("trDet5").Visible = True
-        FVerpCreateTPTBill.FindControl("trDet6").Visible = True
-        FVerpCreateTPTBill.FindControl("tblDetention").Visible = False
       Case "Freight And Detention Separate Bills"
         FVerpCreateTPTBill.FindControl("trDet7").Visible = True
         FVerpCreateTPTBill.FindControl("tblFreight").Visible = True
-        FVerpCreateTPTBill.FindControl("trDet1").Visible = False
-        FVerpCreateTPTBill.FindControl("trDet2").Visible = False
-        FVerpCreateTPTBill.FindControl("trDet3").Visible = False
-        FVerpCreateTPTBill.FindControl("trDet4").Visible = False
-        FVerpCreateTPTBill.FindControl("trDet5").Visible = False
-        FVerpCreateTPTBill.FindControl("trDet6").Visible = False
         FVerpCreateTPTBill.FindControl("tblDetention").Visible = True
+        CType(FVerpCreateTPTBill.FindControl("D_GRNos"), TextBox).Text = CType(FVerpCreateTPTBill.FindControl("F_GRNos"), TextBox).Text
     End Select
-
     Dim mStr As String = ""
     Dim oTR As IO.StreamReader = New IO.StreamReader(HttpContext.Current.Server.MapPath("~/ERP_Main/App_Create") & "/AF_erpCreateTPTBill.js")
     mStr = oTR.ReadToEnd
@@ -60,14 +49,20 @@ Partial Class AF_erpCreateTPTBill
       CType(FVerpCreateTPTBill.FindControl("F_SerialNo"), TextBox).Enabled = False
     End If
   End Sub
+
   <System.Web.Services.WebMethod()>
   <System.Web.Script.Services.ScriptMethod()>
-  Public Shared Function DiscReturnedToByACCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
-    Return SIS.QCM.qcmUsers.SelectqcmUsersAutoCompleteList(prefixText, count, contextKey)
+  Public Shared Function TPTCodeCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
+    Return SIS.VR.vrTransporters.SelectvrTransportersAutoCompleteList(prefixText, count, contextKey)
   End Function
   <System.Web.Services.WebMethod()>
   <System.Web.Script.Services.ScriptMethod()>
-  Public Shared Function CreatedByCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
+  Public Shared Function ProjectIDCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
+    Return SIS.QCM.qcmProjects.SelectqcmProjectsAutoCompleteList(prefixText, count, contextKey)
+  End Function
+  <System.Web.Services.WebMethod()>
+  <System.Web.Script.Services.ScriptMethod()>
+  Public Shared Function DiscReturnedToByACCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
     Return SIS.QCM.qcmUsers.SelectqcmUsersAutoCompleteList(prefixText, count, contextKey)
   End Function
   <System.Web.Services.WebMethod()>
@@ -82,6 +77,37 @@ Partial Class AF_erpCreateTPTBill
       mRet = "0|" & aVal(0) & "|" & oVar.DisplayField
     End If
     Return mRet
+  End Function
+  <System.Web.Services.WebMethod()>
+  Public Shared Function validate_FK_ERP_TransporterBill_ProjectID(ByVal value As String) As String
+    Dim aVal() As String = value.Split(",".ToCharArray)
+    Dim mRet As String = "0|" & aVal(0)
+    Dim ProjectID As String = CType(aVal(1), String)
+    Dim oVar As SIS.QCM.qcmProjects = SIS.QCM.qcmProjects.qcmProjectsGetByID(ProjectID)
+    If oVar Is Nothing Then
+      mRet = "1|" & aVal(0) & "|Record not found."
+    Else
+      mRet = "0|" & aVal(0) & "|" & oVar.DisplayField
+    End If
+    Return mRet
+  End Function
+  <System.Web.Services.WebMethod()>
+  Public Shared Function validate_FK_ERP_TransporterBill_TPTCode(ByVal value As String) As String
+    Dim aVal() As String = value.Split(",".ToCharArray)
+    Dim mRet As String = "0|" & aVal(0)
+    Dim TPTCode As String = CType(aVal(1), String)
+    Dim oVar As SIS.VR.vrTransporters = SIS.VR.vrTransporters.vrTransportersGetByID(TPTCode)
+    If oVar Is Nothing Then
+      mRet = "1|" & aVal(0) & "|Record not found."
+    Else
+      mRet = "0|" & aVal(0) & "|" & oVar.DisplayField
+    End If
+    Return mRet
+  End Function
+  <System.Web.Services.WebMethod()>
+  <System.Web.Script.Services.ScriptMethod()>
+  Public Shared Function CreatedByCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
+    Return SIS.QCM.qcmUsers.SelectqcmUsersAutoCompleteList(prefixText, count, contextKey)
   End Function
   <System.Web.Services.WebMethod()>
   Public Shared Function validate_FK_ERP_TransporterBill_CreatedBy(ByVal value As String) As String
@@ -140,15 +166,9 @@ Partial Class AF_erpCreateTPTBill
     Return mRet
   End Function
 
-  Private Sub FVerpCreateTPTBill_ItemInserting(sender As Object, e As FormViewInsertEventArgs) Handles FVerpCreateTPTBill.ItemInserting
-    Dim BillType As String = CType(FVerpCreateTPTBill.FindControl("F_BillType"), DropDownList).SelectedValue
+  Private Sub FVerpCreateTPTBill_ItemUpdating(sender As Object, e As FormViewUpdateEventArgs) Handles FVerpCreateTPTBill.ItemUpdating
+    Dim BillType As String = "Freight And Detention Separate Bills"
     Select Case BillType
-      Case ""
-        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize("Please Select Bill Type.") & "');", True)
-        e.Cancel = True
-        Exit Sub
-      Case "Freight Bill"
-      Case "Freight Bill With Detention"
       Case "Freight And Detention Separate Bills"
         Dim F_IRNumber As TextBox = FVerpCreateTPTBill.FindControl("F_IRNumber")
         Dim D_IRNumber As TextBox = FVerpCreateTPTBill.FindControl("D_IRNumber")
@@ -184,6 +204,12 @@ Partial Class AF_erpCreateTPTBill
           Exit Sub
         End If
     End Select
-
+  End Sub
+  Private Sub FVerpCreateTPTBill_ItemUpdated(sender As Object, e As FormViewUpdatedEventArgs) Handles FVerpCreateTPTBill.ItemUpdated
+    If e.Exception Is Nothing Then
+      Dim SerialNo As String = e.NewValues("SerialNo")
+      Dim RedirectUrl As String = "~/ERP_Main/App_Edit/EF_erpCreateTPTBill.aspx" & "?SerialNo=" & SerialNo
+      Response.Redirect(RedirectUrl)
+    End If
   End Sub
 End Class
