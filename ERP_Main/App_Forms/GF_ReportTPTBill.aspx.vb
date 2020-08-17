@@ -24,7 +24,7 @@ Partial Class GF_ReportTPTBill
     Dim r As Integer = 4
     Dim c As Integer = 1
     Dim cnt As Integer = 1
-    Dim DownloadName As String = PONo & ".xlsx"
+    Dim DownloadName As String = PONo
 
     Dim POWt As Double = VRs.GetPOWt(PONo)
 
@@ -55,6 +55,16 @@ Partial Class GF_ReportTPTBill
     xlPk.Save()
     xlPk.Dispose()
 
+    If Convert.ToBoolean(ConfigurationManager.AppSettings("PDFReport")) Then
+      If pdfWriter.generateXLPDF(FileName) Then
+        DownloadName = DownloadName & ".PDF"
+        FileName = FileName & ".PDF"
+      Else
+        DownloadName = DownloadName & ".xlsx"
+      End If
+    Else
+      DownloadName = DownloadName & ".xlsx"
+    End If
 
     Response.Clear()
     Response.Cache.SetCacheability(HttpCacheability.NoCache)

@@ -493,9 +493,6 @@ Public Class ProductivityReportClass
     Sql &= "    and upper(dm.t_name) = '" & VaultDB & "' "
     Sql &= "    and dm.t_docn+dm.t_revn not in "
     Sql &= "       ( "
-    'Sql &= "        select isu.t_docn+isu.t_revi from tdmisg011200 as isu "
-    'Sql &= "        where (isu.t_isdt >= '" & FromDate & "') AND (isu.t_isdt < '" & ToDate & "')"
-    'Sql &= "	      Union All "
     Sql &= "	      select "
     Sql &= "	      tl.t_docn+tl.t_revn  "
     Sql &= "	      from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran "
@@ -598,7 +595,6 @@ Public Class ProductivityReportClass
     End Using
     Return Results
   End Function
-  'Report
   Public Shared Function GetBoilerProductivityReport(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As List(Of ProductivityReportClass)
     'Convert From & TO Date yyyy-mm-dd
     ToDate = Convert.ToDateTime(ToDate).AddDays(1)
@@ -634,61 +630,44 @@ Public Class ProductivityReportClass
         VaultDB = "BOILER"
     End Select
     Dim Sql As String = ""
-    Sql = Sql & " select "
-    Sql = Sql & "	aa.DocumentID, "
-    Sql = Sql & "	aa.IssueDate, "
-    Sql = Sql & "	aa.Revision, "
-    Sql = Sql & "	aa.SheetSize, "
-    Sql = Sql & "	(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Discipline, "
-    Sql = Sql & "	(select top 1 isnull(t_oscd,2) from tdmisg140200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Outsourced, "
-    Sql = Sql & " (select top 1 ltrim(t_size) from tdmisg001200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as dmSize, "
-    Sql = Sql & "    (select sum(hh.t_hhrs)    "
-    Sql = Sql & "       from ttiisg910200 hh "
-    Sql = Sql & "       where hh.t_acid in " & FilterActivity
-    Sql = Sql & "		      and aa.DocumentID = hh.t_cdoc "
-    Sql = Sql & "         and cast(hh.t_tdat as date)<=cast(dateadd(d,2,aa.IssueDate) as date)  "
-    Sql = Sql & "         and hh.t_grcd in " & FilterGroup
-    Sql = Sql & "         ) as Hours, "
-    Sql = Sql & "        (select top 1 hh.t_grcd    "
-    Sql = Sql & "            from ttiisg910200 hh "
-    Sql = Sql & "		         where aa.DocumentID = hh.t_cdoc "
-    Sql = Sql & "              and hh.t_acid in " & FilterActivity
-    Sql = Sql & "              and hh.t_grcd in " & FilterGroup
-    Sql = Sql & "        ) as GroupID,"
-    Sql = Sql & "        aa.DocumentID as IssDoc "
-    Sql = Sql & "	From ( "
-    'Sql = Sql & "		select "
-    'Sql = Sql & "			iss.t_docn as DocumentID, "
-    'Sql = Sql & "			iss.t_isdt as IssueDate, "
-    'Sql = Sql & "			iss.t_revi as Revision, "
-    'Sql = Sql & "			iss.t_shsz as SheetSize "
-    'Sql = Sql & "	  from tdmisg011200 as iss  "
-    'Sql = Sql & "	  where iss.t_isdt >= '" & FromDate & "'"
-    'Sql = Sql & "	  Union All "
     Sql = Sql & "	  select "
     Sql = Sql & "	    tl.t_docn as DocumentID, "
     Sql = Sql & "	    th.t_isdt as IssueDate, "
     Sql = Sql & "	    tl.t_revn as Revision, "
-    Sql = Sql & "		  (select dl.t_size from tdmisg121200 as dl where dl.t_docn=tl.t_docn and dl.t_revn=tl.t_revn) as SheetSize "
+    Sql = Sql & "		  (select dl.t_size from tdmisg121200 as dl where dl.t_docn=tl.t_docn and dl.t_revn=tl.t_revn) as SheetSize, "
+    Sql = Sql & "	    (select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=tl.t_docn and t_revn=tl.t_revn) as Discipline, "
+    Sql = Sql & "	    (select top 1 isnull(t_oscd,2) from tdmisg140200 where t_docn=tl.t_docn and t_revn=tl.t_revn) as Outsourced, "
+    Sql = Sql & "     (select top 1 ltrim(t_size) from tdmisg001200 where t_docn=tl.t_docn and t_revn=tl.t_revn) as dmSize, "
+    Sql = Sql & "    (select sum(hh.t_hhrs)    "
+    Sql = Sql & "       from ttiisg910200 hh "
+    Sql = Sql & "       where hh.t_acid in " & FilterActivity
+    Sql = Sql & "		      and tl.t_docn = hh.t_cdoc "
+    Sql = Sql & "         and cast(hh.t_tdat as date)<=cast(dateadd(d,2,th.t_isdt) as date)  "
+    Sql = Sql & "         and hh.t_grcd in " & FilterGroup
+    Sql = Sql & "         ) as Hours, "
+    Sql = Sql & "        (select top 1 hh.t_grcd    "
+    Sql = Sql & "            from ttiisg910200 hh "
+    Sql = Sql & "		         where tl.t_docn = hh.t_cdoc "
+    Sql = Sql & "              and hh.t_acid in " & FilterActivity
+    Sql = Sql & "              and hh.t_grcd in " & FilterGroup
+    Sql = Sql & "        ) as GroupID,"
+    Sql = Sql & "        tl.t_docn as IssDoc "
     Sql = Sql & "	  from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran "
     Sql = Sql & "	  where th.t_isdt >= '" & FromDate & "'"
     Sql = Sql & "   and substring(tl.t_docn,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
-    Sql = Sql & "	) as aa  "
-    Sql = Sql & " where substring(aa.DocumentID,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
-    Sql = Sql & " and   substring(aa.DocumentID,1,20)+ substring('0000'+ltrim(substring(aa.DocumentID,21,4)) ,len('0000'+ltrim(substring(aa.DocumentID,21,4)))-3,4)   "
-    Sql = Sql & "      in (select ltrim(hh.t_cprj)+'-'+ltrim(hh.t_cspa)+'-'+ltrim(hh.t_dcat)+'-'+substring('0000'+ltrim(hh.t_dsno),len('0000'+ltrim(hh.t_dsno))-3 ,4)    "
+    Sql = Sql & "   and  "
+    Sql = Sql & "   tl.t_docn  "
+    Sql = Sql & "      in (select hh.t_cdoc "
     Sql = Sql & "                    from ttiisg910200 hh "
     Sql = Sql & "                    where hh.t_acid in " & FilterActivity
-    Sql = Sql & "                      and cast(hh.t_tdat as date)<=cast(dateadd(d,2,aa.IssueDate) as date)  "
+    Sql = Sql & "                      and cast(hh.t_tdat as date)<=cast(dateadd(d,2,th.t_isdt) as date)  "
     Sql = Sql & "                      and hh.t_grcd in " & FilterGroup & ") "
-    Sql = Sql & "   and aa.Revision in ('0','00','000','R00')  "
-    Sql = Sql & "   and ((aa.IssueDate >= '" & FromDate & "') AND (aa.IssueDate < '" & ToDate & "'))  "
-    Sql = Sql & "   and (aa.IssueDate = (select min(cc.IssueDate) From ( "
-    Sql = Sql & "      SELECT min(iss.t_isdt) as IssueDate from tdmisg011200 as iss where iss.t_docn = aa.DocumentID and iss.t_revi= aa.Revision  "
-    Sql = Sql & "      UNION ALL  "
-    Sql = Sql & "      select min(th.t_isdt) as IssueDate from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran where tl.t_docn = aa.DocumentID and tl.t_revn= aa.Revision  "
-    Sql = Sql & "                      ) as cc)) "
-    Sql = Sql & " Order By aa.DocumentID, aa.IssueDate"
+    Sql = Sql & "   and tl.t_revn in ('0','00','000','R00')  "
+    Sql = Sql & "   and ((th.t_isdt >= '" & FromDate & "') AND (th.t_isdt < '" & ToDate & "'))  "
+    Sql = Sql & "   and (th.t_isdt = ( "
+    Sql = Sql & "      select min(xth.t_isdt) from tdmisg132200 as xtl inner join tdmisg131200 as xth on xtl.t_tran=xth.t_tran where xtl.t_docn = tl.t_docn and xtl.t_revn= tl.t_revn  "
+    Sql = Sql & "                      )) "
+    Sql = Sql & " Order By tl.t_docn, th.t_isdt"
     Dim Results As List(Of ProductivityReportClass) = Nothing
     Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString() & ";Connection Timeout=2400")
       Using Cmd As SqlCommand = Con.CreateCommand()
@@ -706,6 +685,107 @@ Public Class ProductivityReportClass
     End Using
     Return Results
   End Function
+
+  'Report
+  'Public Shared Function GetBoilerProductivityReport(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As List(Of ProductivityReportClass)
+  '  'Convert From & TO Date yyyy-mm-dd
+  '  ToDate = Convert.ToDateTime(ToDate).AddDays(1)
+  '  FromDate = FromDate.Substring(6, 4) & "-" & FromDate.Substring(3, 2) & "-" & FromDate.Substring(0, 2)
+  '  ToDate = ToDate.Substring(6, 4) & "-" & ToDate.Substring(3, 2) & "-" & ToDate.Substring(0, 2)
+  '  Dim FilterActivity As String = "(1,2,75,77,10,19,57,61,76)"
+  '  Dim FilterGroup As String = "('ENGG001','ENGGC','ENGGD','ENGGF','ENGG005','ENGG002','ENGG003','ENGG004')"
+  '  Dim VaultDB As String = "BOILER"
+  '  Select Case Division
+  '    Case "PUNE"
+  '      FilterActivity = "(1,2,10,19,57,61,76)"
+  '      FilterGroup = "('PUNE001')"
+  '      VaultDB = "SMD"
+  '    Case "SMD"
+  '      FilterActivity = "(1,2,10,19,57,61,76)"
+  '      FilterGroup = "('ENGGI')"
+  '      VaultDB = "SMD"
+  '    Case "CHENNAI"
+  '      FilterActivity = "(1,2,75,77,10,19,57,61,76)"
+  '      FilterGroup = "('ENGG005')"
+  '      VaultDB = "BOILER"
+  '    Case "EPC"
+  '      VaultDB = "EPC"
+  '      FilterActivity = "(1,2,10,19,57,61,76)"
+  '      FilterGroup = "('ENGGM','ENGG011','ENGG012','ENGG013','ENGG014','ENGG015')"
+  '    Case "APC"
+  '      VaultDB = "PC"
+  '      FilterActivity = "(1,2,75,77,10,19,57,61,76)"
+  '      FilterGroup = "('ENGG007')"
+  '    Case "BOILER"
+  '      FilterActivity = "(1,2,75,77,10,19,57,61,76)"
+  '      FilterGroup = "('ENGG001','ENGGA','ENGGB','ENGGC','ENGGD','ENGGE','ENGGF','ENGGG','ENGGH','ENGG005','ENGG002','ENGG003','ENGG004','ENGG005','ENGG006','ENGG007','ENGG008','ENGG009')"
+  '      VaultDB = "BOILER"
+  '  End Select
+  '  Dim Sql As String = ""
+  '  Sql = Sql & " select "
+  '  Sql = Sql & "	aa.DocumentID, "
+  '  Sql = Sql & "	aa.IssueDate, "
+  '  Sql = Sql & "	aa.Revision, "
+  '  Sql = Sql & "	aa.SheetSize, "
+  '  Sql = Sql & "	(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Discipline, "
+  '  Sql = Sql & "	(select top 1 isnull(t_oscd,2) from tdmisg140200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Outsourced, "
+  '  Sql = Sql & " (select top 1 ltrim(t_size) from tdmisg001200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as dmSize, "
+  '  Sql = Sql & "    (select sum(hh.t_hhrs)    "
+  '  Sql = Sql & "       from ttiisg910200 hh "
+  '  Sql = Sql & "       where hh.t_acid in " & FilterActivity
+  '  Sql = Sql & "		      and aa.DocumentID = hh.t_cdoc "
+  '  Sql = Sql & "         and cast(hh.t_tdat as date)<=cast(dateadd(d,2,aa.IssueDate) as date)  "
+  '  Sql = Sql & "         and hh.t_grcd in " & FilterGroup
+  '  Sql = Sql & "         ) as Hours, "
+  '  Sql = Sql & "        (select top 1 hh.t_grcd    "
+  '  Sql = Sql & "            from ttiisg910200 hh "
+  '  Sql = Sql & "		         where aa.DocumentID = hh.t_cdoc "
+  '  Sql = Sql & "              and hh.t_acid in " & FilterActivity
+  '  Sql = Sql & "              and hh.t_grcd in " & FilterGroup
+  '  Sql = Sql & "        ) as GroupID,"
+  '  Sql = Sql & "        aa.DocumentID as IssDoc "
+  '  Sql = Sql & "	From ( "
+  '  Sql = Sql & "	  select "
+  '  Sql = Sql & "	    tl.t_docn as DocumentID, "
+  '  Sql = Sql & "	    th.t_isdt as IssueDate, "
+  '  Sql = Sql & "	    tl.t_revn as Revision, "
+  '  Sql = Sql & "		  (select dl.t_size from tdmisg121200 as dl where dl.t_docn=tl.t_docn and dl.t_revn=tl.t_revn) as SheetSize "
+  '  Sql = Sql & "	  from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran "
+  '  Sql = Sql & "	  where th.t_isdt >= '" & FromDate & "'"
+  '  Sql = Sql & "   and substring(tl.t_docn,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
+  '  Sql = Sql & "	) as aa  "
+  '  Sql = Sql & " where substring(aa.DocumentID,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
+  '  Sql = Sql & " and   substring(aa.DocumentID,1,20)+ substring('0000'+ltrim(substring(aa.DocumentID,21,4)) ,len('0000'+ltrim(substring(aa.DocumentID,21,4)))-3,4)   "
+  '  Sql = Sql & "      in (select ltrim(hh.t_cprj)+'-'+ltrim(hh.t_cspa)+'-'+ltrim(hh.t_dcat)+'-'+substring('0000'+ltrim(hh.t_dsno),len('0000'+ltrim(hh.t_dsno))-3 ,4)    "
+  '  Sql = Sql & "                    from ttiisg910200 hh "
+  '  Sql = Sql & "                    where hh.t_acid in " & FilterActivity
+  '  Sql = Sql & "                      and cast(hh.t_tdat as date)<=cast(dateadd(d,2,aa.IssueDate) as date)  "
+  '  Sql = Sql & "                      and hh.t_grcd in " & FilterGroup & ") "
+  '  Sql = Sql & "   and aa.Revision in ('0','00','000','R00')  "
+  '  Sql = Sql & "   and ((aa.IssueDate >= '" & FromDate & "') AND (aa.IssueDate < '" & ToDate & "'))  "
+  '  Sql = Sql & "   and (aa.IssueDate = (select min(cc.IssueDate) From ( "
+  '  Sql = Sql & "      SELECT min(iss.t_isdt) as IssueDate from tdmisg011200 as iss where iss.t_docn = aa.DocumentID and iss.t_revi= aa.Revision  "
+  '  Sql = Sql & "      UNION ALL  "
+  '  Sql = Sql & "      select min(th.t_isdt) as IssueDate from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran where tl.t_docn = aa.DocumentID and tl.t_revn= aa.Revision  "
+  '  Sql = Sql & "                      ) as cc)) "
+  '  Sql = Sql & " Order By aa.DocumentID, aa.IssueDate"
+  '  Dim Results As List(Of ProductivityReportClass) = Nothing
+  '  Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString() & ";Connection Timeout=2400")
+  '    Using Cmd As SqlCommand = Con.CreateCommand()
+  '      Cmd.CommandType = CommandType.Text
+  '      Cmd.CommandText = Sql
+  '      Cmd.CommandTimeout = 2400
+  '      Results = New List(Of ProductivityReportClass)
+  '      Con.Open()
+  '      Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+  '      While (Reader.Read())
+  '        Results.Add(New ProductivityReportClass(Reader))
+  '      End While
+  '      Reader.Close()
+  '    End Using
+  '  End Using
+  '  Return Results
+  'End Function
   Public Shared Function GetNewProductivityReport(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As List(Of ProductivityReportClass)
     'Convert From & TO Date yyyy-mm-dd
     ToDate = Convert.ToDateTime(ToDate).AddDays(1)
@@ -859,53 +939,38 @@ Public Class ProductivityReportClass
         VaultDB = "BOILER"
     End Select
     Dim Sql As String = ""
-    Sql = Sql & " select * from (select "
-    Sql = Sql & "	aa.DocumentID, "
-    Sql = Sql & "	aa.IssueDate, "
-    Sql = Sql & "	aa.Revision, "
-    Sql = Sql & "	aa.SheetSize, "
-    Sql = Sql & " (select top 1 ltrim(t_size) from tdmisg001200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as dmSize, "
-    Sql = Sql & "	(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Discipline, "
-    Sql = Sql & "	(select top 1 isnull(t_oscd,2) from tdmisg140200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Outsourced, "
-    Sql = Sql & "    (select sum(hh.t_hhrs)    "
-    Sql = Sql & "       from ttiisg910200 hh "
-    Sql = Sql & "       where hh.t_acid in " & FilterActivity
-    Sql = Sql & "		      and aa.DocumentID = hh.t_cdoc "
-    Sql = Sql & "         and cast(hh.t_tdat as date)<=cast(dateadd(d,2,aa.IssueDate) as date)  "
-    Sql = Sql & "         and hh.t_grcd in " & FilterGroup
-    Sql = Sql & "         ) as Hours, "
-    Sql = Sql & "        (select top 1 hh.t_grcd    "
-    Sql = Sql & "            from ttiisg910200 hh "
-    Sql = Sql & "		         where aa.DocumentID = hh.t_cdoc "
-    Sql = Sql & "              and hh.t_acid in " & FilterActivity
-    Sql = Sql & "              and hh.t_grcd in " & FilterGroup
-    Sql = Sql & "        ) as GroupID,"
-    Sql = Sql & "        aa.DocumentID as IssDoc "
-    Sql = Sql & "	From ( "
-    'Sql = Sql & "		select "
-    'Sql = Sql & "			iss.t_docn as DocumentID, "
-    'Sql = Sql & "			iss.t_isdt as IssueDate, "
-    'Sql = Sql & "			iss.t_revi as Revision, "
-    'Sql = Sql & "			iss.t_shsz as SheetSize "
-    'Sql = Sql & "	  from tdmisg011200 as iss  "
-    'Sql = Sql & "	  Union All "
+    Sql = Sql & " select * from ( "
     Sql = Sql & "	  select "
     Sql = Sql & "	    tl.t_docn as DocumentID, "
     Sql = Sql & "	    th.t_isdt as IssueDate, "
     Sql = Sql & "	    tl.t_revn as Revision, "
-    Sql = Sql & "		  (select dl.t_size from tdmisg121200 as dl where dl.t_docn=tl.t_docn and dl.t_revn=tl.t_revn) as SheetSize "
+    Sql = Sql & "		  (select dl.t_size from tdmisg121200 as dl where dl.t_docn=tl.t_docn and dl.t_revn=tl.t_revn) as SheetSize, "
+    Sql = Sql & " (select top 1 ltrim(t_size) from tdmisg001200 where t_docn=tl.t_docn and t_revn=tl.t_revn) as dmSize, "
+    Sql = Sql & "	(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=tl.t_docn and t_revn=tl.t_revn) as Discipline, "
+    Sql = Sql & "	(select top 1 isnull(t_oscd,2) from tdmisg140200 where t_docn=tl.t_docn and t_revn=tl.t_revn) as Outsourced, "
+    Sql = Sql & "    (select sum(hh.t_hhrs)    "
+    Sql = Sql & "       from ttiisg910200 hh "
+    Sql = Sql & "       where hh.t_acid in " & FilterActivity
+    Sql = Sql & "		      and tl.t_docn = hh.t_cdoc "
+    Sql = Sql & "         and cast(hh.t_tdat as date)<=cast(dateadd(d,2,th.t_isdt) as date)  "
+    Sql = Sql & "         and hh.t_grcd in " & FilterGroup
+    Sql = Sql & "         ) as Hours, "
+    Sql = Sql & "        (select top 1 hh.t_grcd    "
+    Sql = Sql & "            from ttiisg910200 hh "
+    Sql = Sql & "		         where tl.t_docn = hh.t_cdoc "
+    Sql = Sql & "              and hh.t_acid in " & FilterActivity
+    Sql = Sql & "              and hh.t_grcd in " & FilterGroup
+    Sql = Sql & "        ) as GroupID,"
+    Sql = Sql & "        tl.t_docn as IssDoc "
     Sql = Sql & "	  from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran "
-    Sql = Sql & "	) as aa  "
-    Sql = Sql & " inner join tdmisg001200 as dm on dm.t_docn = aa.DocumentID and dm.t_revn = aa.Revision "
-    Sql = Sql & " where substring(aa.DocumentID,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
+    Sql = Sql & " inner join tdmisg001200 as dm on dm.t_docn = tl.t_docn and dm.t_revn = tl.t_revn "
+    Sql = Sql & " where substring(tl.t_docn,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
     Sql = Sql & "   and upper(dm.t_name) = '" & VaultDB & "' "
-    Sql = Sql & "   and aa.Revision in ('0','00','000','R00')  "
-    Sql = Sql & "   and ((aa.IssueDate >= '" & FromDate & "') AND (aa.IssueDate < '" & ToDate & "'))  "
-    Sql = Sql & "   and (aa.IssueDate = (select min(cc.IssueDate) From ( "
-    Sql = Sql & "      SELECT min(iss.t_isdt) as IssueDate from tdmisg011200 as iss where iss.t_docn = aa.DocumentID and iss.t_revi= aa.Revision  "
-    Sql = Sql & "      UNION ALL  "
-    Sql = Sql & "      select min(th.t_isdt) as IssueDate from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran where tl.t_docn = aa.DocumentID and tl.t_revn= aa.Revision  "
-    Sql = Sql & "                      ) as cc)) ) as ll "
+    Sql = Sql & "   and tl.t_revn in ('0','00','000','R00')  "
+    Sql = Sql & "   and ((th.t_isdt >= '" & FromDate & "') AND (th.t_isdt < '" & ToDate & "'))  "
+    Sql = Sql & "   and (th.t_isdt = ( "
+    Sql = Sql & "      select min(xth.t_isdt) from tdmisg132200 as xtl inner join tdmisg131200 as xth on xtl.t_tran=xth.t_tran where xtl.t_docn = tl.t_docn and xtl.t_revn= tl.t_revn  "
+    Sql = Sql & "                      )) ) as ll "
     Sql = Sql & " WHERE ll.Hours is null ORDER By ll.DocumentID,ll.IssueDate"
 
 
@@ -963,63 +1028,38 @@ Public Class ProductivityReportClass
         VaultDB = "BOILER"
     End Select
     Dim Sql As String = ""
-    Sql = Sql & " select * from (select "
-    Sql = Sql & "	aa.DocumentID, "
-    Sql = Sql & "	aa.IssueDate, "
-    Sql = Sql & "	aa.Revision, "
-    Sql = Sql & "	aa.SheetSize, "
-    Sql = Sql & " (select top 1 ltrim(t_size) from tdmisg001200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as dmSize, "
-    Sql = Sql & "	(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Discipline, "
-    Sql = Sql & "	(select top 1 isnull(t_oscd,2) from tdmisg140200 where t_docn=aa.DocumentID and t_revn=aa.Revision) as Outsourced, "
-    Sql = Sql & "    (select sum(hh.t_hhrs)    "
-    Sql = Sql & "       from ttiisg910200 hh "
-    Sql = Sql & "       where hh.t_acid in " & FilterActivity
-    Sql = Sql & "         and substring(aa.DocumentID,1,6) = ltrim(hh.t_cprj)"
-    Sql = Sql & "         and substring(aa.DocumentID,8,8) = ltrim(hh.t_cspa)"
-    Sql = Sql & "         and substring(aa.DocumentID,17,3) = ltrim(hh.t_dcat) "
-    Sql = Sql & "         and ( substring('0000'+ltrim(substring(aa.DocumentID,21,4)) ,len('0000'+ltrim(substring(aa.DocumentID,21,4)))-3,4)"
-    Sql = Sql & "           = substring('0000'+ltrim(hh.t_dsno),len('0000'+ltrim(hh.t_dsno))-3 ,4)   "
-    Sql = Sql & "             )"
-    Sql = Sql & "         and cast(hh.t_tdat as date)<=cast(dateadd(d,2,aa.IssueDate) as date)  "
-    Sql = Sql & "         and hh.t_grcd in " & FilterGroup
-    Sql = Sql & "         ) as Hours, "
-    Sql = Sql & "        (select top 1 hh.t_grcd    "
-    Sql = Sql & "            from ttiisg910200 hh "
-    Sql = Sql & "		         where(substring(aa.DocumentID, 1, 6) = LTrim(hh.t_cprj))"
-    Sql = Sql & "              and substring(aa.DocumentID,8,8) = ltrim(hh.t_cspa)"
-    Sql = Sql & "              and substring(aa.DocumentID,17,3) = ltrim(hh.t_dcat) "
-    Sql = Sql & "              and ( substring('0000'+ltrim(substring(aa.DocumentID,21,4)) ,len('0000'+ltrim(substring(aa.DocumentID,21,4)))-3,4)"
-    Sql = Sql & "                    = substring('0000'+ltrim(hh.t_dsno),len('0000'+ltrim(hh.t_dsno))-3 ,4)   "
-    Sql = Sql & "                  )"
-    Sql = Sql & "              and hh.t_acid in " & FilterActivity
-    Sql = Sql & "              and hh.t_grcd in " & FilterGroup
-    Sql = Sql & "        ) as GroupID,"
-    Sql = Sql & "        substring(aa.DocumentID,1,20)+ substring('0000'+ltrim(substring(aa.DocumentID,21,4)) ,len('0000'+ltrim(substring(aa.DocumentID,21,4)))-3,4) as IssDoc "
-    Sql = Sql & "	From ( "
-    Sql = Sql & "		select "
-    Sql = Sql & "			iss.t_docn as DocumentID, "
-    Sql = Sql & "			iss.t_isdt as IssueDate, "
-    Sql = Sql & "			iss.t_revi as Revision, "
-    Sql = Sql & "			iss.t_shsz as SheetSize "
-    Sql = Sql & "	  from tdmisg011200 as iss  "
-    Sql = Sql & "	  Union All "
+    Sql = Sql & " select * from ( "
     Sql = Sql & "	  select "
     Sql = Sql & "	    tl.t_docn as DocumentID, "
     Sql = Sql & "	    th.t_isdt as IssueDate, "
     Sql = Sql & "	    tl.t_revn as Revision, "
-    Sql = Sql & "		  (select dl.t_size from tdmisg121200 as dl where dl.t_docn=tl.t_docn and dl.t_revn=tl.t_revn) as SheetSize "
+    Sql = Sql & "		  (select dl.t_size from tdmisg121200 as dl where dl.t_docn=tl.t_docn and dl.t_revn=tl.t_revn) as SheetSize, "
+    Sql = Sql & "	    (select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=tl.t_docn and t_revn=tl.t_revn) as Discipline, "
+    Sql = Sql & "	    (select top 1 isnull(t_oscd,2) from tdmisg140200 where t_docn=tl.t_docn and t_revn=tl.t_revn) as Outsourced, "
+    Sql = Sql & "     (select top 1 ltrim(t_size) from tdmisg001200 where t_docn=tl.t_docn and t_revn=tl.t_revn) as dmSize, "
+    Sql = Sql & "    (select sum(hh.t_hhrs)    "
+    Sql = Sql & "       from ttiisg910200 hh "
+    Sql = Sql & "       where hh.t_acid in " & FilterActivity
+    Sql = Sql & "		      and tl.t_docn = hh.t_cdoc "
+    Sql = Sql & "         and cast(hh.t_tdat as date)<=cast(dateadd(d,2,th.t_isdt) as date)  "
+    Sql = Sql & "         and hh.t_grcd in " & FilterGroup
+    Sql = Sql & "         ) as Hours, "
+    Sql = Sql & "        (select top 1 hh.t_grcd    "
+    Sql = Sql & "            from ttiisg910200 hh "
+    Sql = Sql & "		         where tl.t_docn = hh.t_cdoc "
+    Sql = Sql & "              and hh.t_acid in " & FilterActivity
+    Sql = Sql & "              and hh.t_grcd in " & FilterGroup
+    Sql = Sql & "        ) as GroupID,"
+    Sql = Sql & "        tl.t_docn as IssDoc "
     Sql = Sql & "	  from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran "
-    Sql = Sql & "	) as aa  "
-    Sql = Sql & " inner join tdmisg001200 as dm on dm.t_docn = aa.DocumentID and dm.t_revn = aa.Revision "
-    Sql = Sql & " where substring(aa.DocumentID,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
+    Sql = Sql & "   inner join tdmisg001200 as dm on dm.t_docn = tl.t_docn and dm.t_revn = tl.t_revn "
+    Sql = Sql & "   where substring(tl.t_docn,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "
     Sql = Sql & "   and upper(dm.t_name) = '" & VaultDB & "' "
-    Sql = Sql & "   and aa.Revision in ('0','00','000','R00')  "
-    Sql = Sql & "   and ((aa.IssueDate >= '" & FromDate & "') AND (aa.IssueDate < '" & ToDate & "'))  "
-    Sql = Sql & "   and (aa.IssueDate = (select min(cc.IssueDate) From ( "
-    Sql = Sql & "      SELECT min(iss.t_isdt) as IssueDate from tdmisg011200 as iss where iss.t_docn = aa.DocumentID and iss.t_revi= aa.Revision  "
-    Sql = Sql & "      UNION ALL  "
-    Sql = Sql & "      select min(th.t_isdt) as IssueDate from tdmisg132200 as tl inner join tdmisg131200 as th on tl.t_tran=th.t_tran where tl.t_docn = aa.DocumentID and tl.t_revn= aa.Revision  "
-    Sql = Sql & "                      ) as cc)) ) as ll "
+    Sql = Sql & "   and tl.t_revn in ('0','00','000','R00')  "
+    Sql = Sql & "   and ((th.t_isdt >= '" & FromDate & "') AND (th.t_isdt < '" & ToDate & "'))  "
+    Sql = Sql & "   and (th.t_isdt = ( "
+    Sql = Sql & "      select min(xth.t_isdt) from tdmisg132200 as xtl inner join tdmisg131200 as xth on xtl.t_tran=xth.t_tran where xtl.t_docn = tl.t_docn and xtl.t_revn= tl.t_revn  "
+    Sql = Sql & "                      )) ) as ll "
     Sql = Sql & " WHERE ll.Hours is null ORDER By ll.DocumentID,ll.IssueDate"
 
 
