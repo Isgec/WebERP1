@@ -98,6 +98,8 @@ Partial Class DCRReport
 				.Cells(r, 4).Value = doc.ReleaseDate
         .Cells(r, 5).Value = doc.DCRDesc
         .Cells(r, 6).Value = doc.Discipline
+        .Cells(r, 7).Value = doc.GroupID
+        .Cells(r, 8).Value = ReportClass.GetGroupDesc(doc.GroupID)
         r += 1
       Next
 
@@ -116,7 +118,8 @@ Partial Class DCRReport
         .Cells(r, 3).Value = doc.RevisionNo
         .Cells(r, 4).Value = doc.ReleaseDate
         .Cells(r, 5).Value = doc.Discipline
-        '.Cells(r, 5).Value = doc.DCRDesc
+        .Cells(r, 6).Value = doc.GroupID
+        .Cells(r, 7).Value = ReportClass.GetGroupDesc(doc.GroupID)
         r += 1
       Next
 
@@ -138,6 +141,7 @@ Public Class ReportClass
   Public DCRCate As String = ""
   Public DCRDesc As String = ""
   Public Discipline As String = ""
+  Public GroupID As String = ""
   'Public Sub New(ByVal Reader As SqlDataReader)
   '  Try
   '    For Each pi As System.Reflection.PropertyInfo In Me.GetType.GetProperties
@@ -171,6 +175,99 @@ Public Class ReportClass
   '  Catch ex As Exception
   '  End Try
   'End Sub
+  Public Shared Function GetGroupDesc(GroupID As String) As String
+    Dim mRet As String = ""
+    Select Case GroupID
+      Case "ENGG001"
+        mRet = "Mechanical"
+
+      Case "ENGG002"
+        mRet = "Thermal & Process Group"
+
+      Case "ENGG003"
+        mRet = "Standardisation Group"
+
+      Case "ENGG004"
+        mRet = "PC Boiler Engineering"
+
+      Case "ENGG005"
+        mRet = "Boiler Chennai Design centre"
+
+      Case "ENGG006"
+        mRet = "Engg. Administration"
+
+      Case "ENGG007"
+        mRet = "APCE-Design"
+
+      Case "ENGG008"
+        mRet = "Boiler Proposal Chennai"
+
+      Case "ENGG009"
+        mRet = "CFBC-Thermal and Process"
+
+      Case "ENGG011"
+        mRet = "EPC-Engineering_Mechanical"
+
+
+      Case "ENGG012"
+        mRet = "EPC-Engineering_Electrical"
+
+
+      Case "ENGG013"
+        mRet = "EPC-Engineering_Piping"
+
+
+      Case "ENGG014"
+        mRet = "EPC-Engineering_C&I"
+
+
+      Case "ENGG015"
+        mRet = "EPC-Engineering_Civil/Structure"
+
+
+      Case "ENGGA"
+        mRet = "TG AND DG GROUP"
+
+      Case "ENGB"
+        mRet = "AFBC GROUP"
+
+      Case "ENGGC"
+        mRet = "CFBC GROUP"
+
+      Case "ENGGD"
+        mRet = "PIPING & WATER TREATMENT GROUP"
+
+      Case "ENGGE"
+        mRet = "STANDARDISATION GROUP"
+
+      Case "ENGGF"
+        mRet = "STRUCTURAL GROUP"
+
+      Case "ENGGG"
+        mRet = "ELECTRICAL GROUP"
+
+      Case "ENGGH"
+        mRet = "CONTROL &INSTRUMENTATION GROUP"
+
+      Case "ENGGI"
+        mRet = "SMD DESIGN GROUP"
+
+      Case "ENGGJ"
+        mRet = "GEBD CHENNAI DESIGN CENTRE"
+
+      Case "ENGGK"
+        mRet = "IBD CHENNAI DESIGN CENTRE"
+
+      Case "ENGGL"
+        mRet = "OIL & GAS FIRED GROUP"
+
+      Case "ENGGM"
+        mRet = "EPC CHENNAI DESIGN CENTRE"
+
+    End Select
+    Return mRet
+  End Function
+
 
   Sub New(ByVal Rd As SqlDataReader)
     On Error Resume Next
@@ -184,6 +281,7 @@ Public Class ReportClass
     DCRCate = Rd("DCRCate")
     DCRDesc = Rd("DCRDesc")
     Discipline = Rd("Discipline")
+    GroupID = Rd("GroupID")
   End Sub
   Public Shared Function GetAllDCR(ByVal FromDate As String, ByVal ToDate As String, ByVal Division As String) As List(Of ReportClass)
     'Convert From & TO Date yyyy-mm-dd
@@ -242,7 +340,11 @@ Public Class ReportClass
     Sql &= "dm.t_adat as ReleaseDate, "
     Sql &= "dl.t_catg as DCRCate, "
     Sql &= "cm.t_dsca as DCRDesc,"
-    Sql &= "(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=dm.t_docn And t_revn=dm.t_revn) as Discipline "
+    Sql &= "(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=dm.t_docn And t_revn=dm.t_revn) as Discipline, "
+    Sql &= "        (select top 1 hh.t_grcd    "
+    Sql &= "            from ttiisg910200 hh "
+    Sql &= "		         where dm.t_docn = hh.t_cdoc "
+    Sql &= "        ) as GroupID "
     Sql &= "from tdmisg001200 as dm "
     Sql &= "left outer join tdmisg115200 as dl on (dm.t_docn=dl.t_docd and  right('00'+ltrim(str(convert(int,dm.t_revn)-1)),2)=dl.t_revn) "
     Sql &= "left outer join tdmisg111200 as cm on dl.t_catg = cm.t_code "
@@ -317,7 +419,11 @@ Public Class ReportClass
     Sql &= "  dm.t_adat as ReleaseDate, "
     Sql &= "		       Month(dm.t_adat) as MonthName,"
     Sql &= "		       Year(dm.t_adat) as YearName,"
-    Sql &= "(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=dm.t_docn And t_revn=dm.t_revn) as Discipline "
+    Sql &= "(select top 1 ltrim(t_resp) from tdmisg121200 where t_docn=dm.t_docn And t_revn=dm.t_revn) as Discipline, "
+    Sql &= "        (select top 1 hh.t_grcd    "
+    Sql &= "            from ttiisg910200 hh "
+    Sql &= "		         where dm.t_docn = hh.t_cdoc "
+    Sql &= "        ) as GroupID"
     Sql &= "		  from tdmisg001200 as dm"
     Sql &= "  where ((Month(dm.t_adat) = Month(convert(datetime,'" & ToDate & "',103))) AND (Year(dm.t_adat) = Year(convert(datetime,'" & ToDate & "',103)))) "
 		Sql &= "  and substring(dm.t_docn,17,3) not in ('VEN','SPC','POS','CCL','GPD','VSH','DOC','TDS','MIS','DCL','FNT','MTO') "

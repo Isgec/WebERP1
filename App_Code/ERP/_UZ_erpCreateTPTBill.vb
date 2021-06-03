@@ -513,6 +513,7 @@ Namespace SIS.ERP
       Return _Result
     End Function
     Public Shared Function getIRData(ByVal IRNo As String) As SIS.ERP.erpCreateTPTBill
+      Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
       Dim oTptBill As SIS.ERP.erpCreateTPTBill = SIS.ERP.erpCreateTPTBill.erpCreateTPTBillGetByIRNumber(IRNo)
       If oTptBill IsNot Nothing Then
         Throw New Exception("IR Number already used.")
@@ -543,9 +544,9 @@ Namespace SIS.ERP
       Sql = Sql & "gst.t_tval as TotalAmount, "
       Sql = Sql & "gr.t_grno as GRNOs, "
       Sql = Sql & "gr.t_grdt as GRDTs "
-      Sql = Sql & "from ttfacp100200 as ir "
-      Sql = Sql & "left outer join ttfisg407200 as gst on ir.t_ninv = gst.t_ninv and gst.t_pono=1 "
-      Sql = Sql & "left outer join ttfisg002200 as gr on ir.t_ninv = gr.t_irno "
+      Sql = Sql & "from ttfacp100" & Comp & " as ir "
+      Sql = Sql & "left outer join ttfisg407" & Comp & " as gst on ir.t_ninv = gst.t_ninv and gst.t_pono=1 "
+      Sql = Sql & "left outer join ttfisg002" & Comp & " as gr on ir.t_ninv = gr.t_irno "
       Sql = Sql & "where ir.t_ninv = " & IRNo
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()

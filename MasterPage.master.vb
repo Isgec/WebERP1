@@ -18,9 +18,17 @@ Partial Class lgMasterPage
         algmnu.InnerHtml = tmp.ReadToEnd().Replace("~", HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority & HttpContext.Current.Request.ApplicationPath)
         tmp.Close()
       End If
+      LblCompanyName.Text = SIS.COM.comFinanceCompany.comFinanceCompanyGetByID(HttpContext.Current.Session("FinanceCompany")).CompanyName
     End If
-
   End Sub
+  Public Property DisplayCompanyName As String
+    Get
+      Return ""
+    End Get
+    Set(value As String)
+      LblCompanyName.Text = SIS.COM.comFinanceCompany.comFinanceCompanyGetByID(HttpContext.Current.Session("FinanceCompany")).CompanyName
+    End Set
+  End Property
   Public Function GetRelativePath(ByVal mPath As String) As String
     Return VirtualPathUtility.MakeRelative(Page.AppRelativeVirtualPath, mPath)
   End Function

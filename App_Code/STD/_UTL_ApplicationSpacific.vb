@@ -9,6 +9,7 @@ Namespace SIS.SYS.Utilities
       With HttpContext.Current
         .Session("ApplicationID") = 21
         .Session("ApplicationDefaultPage") = "~/Default.aspx"
+        .Session("FinanceCompany") = "200"
       End With
     End Sub
     Public Shared Function GetPassword() As String

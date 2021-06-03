@@ -91,11 +91,13 @@ Partial Class GF_ReportTPTBill
     Public Property Remarks As String = ""
 
     Public Shared Function GetPOWt(PONO As String) As Decimal
+      Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
+
       Dim mRet As Decimal = 0
       Dim Sql As String = ""
       Sql &= " select "
       Sql &= " isnull(sum(case when t_cuqp='mt' then t_qoor*1000 else t_qoor end),0) as tmp "
-      Sql &= " From ttdpur401200 "
+      Sql &= " From ttdpur401" & Comp
       Sql &= "  Where t_cuqp In ('kg','mt') "
       Sql &= " And t_orno ='" & PONO & "'"
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())

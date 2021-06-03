@@ -44,15 +44,11 @@ Partial Class GF_updEstimate
 								xlP.Dispose()
 								Exit Sub
 							End If
-							'===============
-							'For New Company
-							If ProjectID.StartsWith("BS") Then
-								eLine.Company = "700"
-							Else
-								eLine.Company = "200"
-							End If
-							'===============
-							Dim tmpPO As New eLine
+              '===============
+              'For New Company
+              eLine.Company = HttpContext.Current.Session("FinanceCompany")
+              '===============
+              Dim tmpPO As New eLine
 
 							Dim delText As String = eLine.DeleteEstimateLineByProject(ProjectID)
 
@@ -224,7 +220,7 @@ over:
     End Function
     Public Shared Function InsertData(ByVal eL As eLine) As String
       Dim Sql As String = ""
-      Sql &= "Insert Into ttpest200200 "
+      Sql &= "Insert Into ttpest200" & Company & " "
       Sql &= "(t_cprj,t_vers,t_sern,t_ffno,t_dico,t_desa,t_cotp,t_psel,t_quan,t_pric,t_rats,t_nspr,t_asve_l,t_asvv_l,t_asvs_l,t_easv_l,t_vasv_l,t_sasv_l,t_tave_l,t_tavv_l,t_tavs_l,t_cosa,t_lcos,t_gsam,t_nsam,t_unit,t_unrt,t_etyp,t_levl,t_udst,t_item,t_cequ,t_desc,t_stat,t_isco,t_icos,t_isal,t_cspt,t_scpf,t_adjf,t_norm,t_prat,t_clrt,t_curr,t_dfpc,t_rtcc_1,t_rtcc_2,t_rtcc_3,t_rtfc_1,t_rtfc_2,t_rtfc_3,t_sper,t_sura,t_esca,t_cona,t_mper,t_mara,t_scur,t_fspr,t_rtcs_1,t_rtcs_2,t_rtcs_3,t_rtfs_1,t_rtfs_2,t_rtfs_3,t_dper,t_disa,t_asta,t_astb,t_astc,t_astd,t_aste,t_astf,t_astg,t_ssel,t_laun,t_cpva,t_ocpr,t_ospr,t_prim,t_exbc_1,t_exbc_2,t_exbc_3,t_exbs_1,t_exbs_2,t_exbs_3,t_cvat_l,t_cltx_l,t_extx_l,t_stmt_l,t_cch1_l,t_ccp1_l,t_cch2_l,t_ccp2_l,t_cch3_l,t_ccp3_l,t_cch4_l,t_ccp4_l,t_octr_l,t_ocpr_l,t_otbp,t_txta,t_Refcntd,t_Refcntu)"
       Sql &= " Values('" & eL.t_cprj & "','" & eL.t_vers & "','" & eL.t_sern & "','" & eL.t_ffno & "',Convert(DateTime,'" & eL.t_dico & "',103),Convert(DateTime,'" & eL.t_desa & "',103),'" & eL.t_cotp & "','" & eL.t_psel & "','" & eL.t_quan & "','" & eL.t_pric & "','" & eL.t_rats & "','" & eL.t_nspr & "','" & eL.t_asve_l & "','" & eL.t_asvv_l & "','" & eL.t_asvs_l & "','" & eL.t_easv_l & "','" & eL.t_vasv_l & "','" & eL.t_sasv_l & "','" & eL.t_tave_l & "','" & eL.t_tavv_l & "','" & eL.t_tavs_l & "','" & eL.t_cosa & "','" & eL.t_lcos & "','" & eL.t_gsam & "','" & eL.t_nsam & "','" & eL.t_unit & "','" & eL.t_unrt & "','" & eL.t_etyp & "','" & eL.t_levl & "','" & eL.t_udst & "','" & eL.t_item & "','" & eL.t_cequ & "','" & eL.t_desc & "','" & eL.t_stat & "','" & eL.t_isco & "','" & eL.t_icos & "','" & eL.t_isal & "','" & eL.t_cspt & "','" & eL.t_scpf & "','" & eL.t_adjf & "','" & eL.t_norm & "','" & eL.t_prat & "','" & eL.t_clrt & "','" & eL.t_curr & "','" & eL.t_dfpc & "','" & eL.t_rtcc_1 & "','" & eL.t_rtcc_2 & "','" & eL.t_rtcc_3 & "','" & eL.t_rtfc_1 & "','" & eL.t_rtfc_2 & "','" & eL.t_rtfc_3 & "','" & eL.t_sper & "','" & eL.t_sura & "','" & eL.t_esca & "','" & eL.t_cona & "','" & eL.t_mper & "','" & eL.t_mara & "','" & eL.t_scur & "','" & eL.t_fspr & "','" & eL.t_rtcs_1 & "','" & eL.t_rtcs_2 & "','" & eL.t_rtcs_3 & "','" & eL.t_rtfs_1 & "','" & eL.t_rtfs_2 & "','" & eL.t_rtfs_3 & "','" & eL.t_dper & "','" & eL.t_disa & "','" & eL.t_asta & "','" & eL.t_astb & "','" & eL.t_astc & "','" & eL.t_astd & "','" & eL.t_aste & "','" & eL.t_astf & "','" & eL.t_astg & "','" & eL.t_ssel & "','" & eL.t_laun & "','" & eL.t_cpva & "','" & eL.t_ocpr & "','" & eL.t_ospr & "','" & eL.t_prim & "','" & eL.t_exbc_1 & "','" & eL.t_exbc_2 & "','" & eL.t_exbc_3 & "','" & eL.t_exbs_1 & "','" & eL.t_exbs_2 & "','" & eL.t_exbs_3 & "','" & eL.t_cvat_l & "','" & eL.t_cltx_l & "','" & eL.t_extx_l & "','" & eL.t_stmt_l & "','" & eL.t_cch1_l & "','" & eL.t_ccp1_l & "','" & eL.t_cch2_l & "','" & eL.t_ccp2_l & "','" & eL.t_cch3_l & "','" & eL.t_ccp3_l & "','" & eL.t_cch4_l & "','" & eL.t_ccp4_l & "','" & eL.t_octr_l & "','" & eL.t_ocpr_l & "','" & eL.t_otbp & "','" & eL.t_txta & "','" & eL.t_Refcntd & "','" & eL.t_Refcntu & "')"
 
@@ -262,17 +258,9 @@ over:
       End Using
       Return Results
 		End Function
-		Private Shared _Company As String = "200"
-		Public Shared Property Company() As String
-			Get
-				Return _Company
-			End Get
-			Set(ByVal value As String)
-				_Company = value
-			End Set
-		End Property
+    Public Shared Property Company As String = HttpContext.Current.Session("FinanceCompany")
 
-		Private _t_cprj As String = "JB0993"						 'From XL	Project     
+    Private _t_cprj As String = "JB0993"						 'From XL	Project     
 		Private _t_vers As String = "1"									 'Always	001         
 		Private _t_sern As String = "20"								 'From XL	Sequence    
 		Private _t_ffno As String = "101070912"					 'First Free No	    
@@ -1839,24 +1827,10 @@ over:
 
 
 
-		Public Sub New(ByVal Reader As SqlDataReader)
-			Try
-				For Each pi As System.Reflection.PropertyInfo In Me.GetType.GetProperties
-					If pi.MemberType = Reflection.MemberTypes.Property Then
-						Try
-							If Convert.IsDBNull(Reader(pi.Name)) Then
-								CallByName(Me, pi.Name, CallType.Let, String.Empty)
-							Else
-								CallByName(Me, pi.Name, CallType.Let, Reader(pi.Name))
-							End If
-						Catch ex As Exception
-						End Try
-					End If
-				Next
-			Catch ex As Exception
-			End Try
-		End Sub
-		Public Sub New()
+    Public Sub New(ByVal Reader As SqlDataReader)
+      SIS.SYS.SQLDatabase.DBCommon.NewObj(Me, Reader)
+    End Sub
+    Public Sub New()
 		End Sub
 
 	End Class
@@ -1868,108 +1842,3 @@ over:
 	End Sub
 End Class
 
-'Sql = "Update ttpest200200 set "
-'Sql &= "	 t_cprj   ='" & eL.t_cprj & "'"
-'Sql &= "	,t_vers   ='" & eL.t_vers & "'"
-'Sql &= "	,t_sern   ='" & eL.t_sern & "'"
-'Sql &= "	,t_ffno   ='" & eL.t_ffno & "'"
-'Sql &= "	,t_dico   ='" & eL.t_dico & "'"
-'Sql &= "	,t_desa   ='" & eL.t_desa & "'"
-'Sql &= "	,t_cotp   ='" & eL.t_cotp & "'"
-'Sql &= "	,t_psel   ='" & eL.t_psel & "'"
-'Sql &= "	,t_quan   ='" & eL.t_quan & "'"
-'Sql &= "	,t_pric   ='" & eL.t_pric & "'"
-'Sql &= "	,t_rats   ='" & eL.t_rats & "'"
-'Sql &= "	,t_nspr   ='" & eL.t_nspr & "'"
-'Sql &= "	,t_asve_l ='" & eL.t_asve_l & "'"
-'Sql &= "	,t_asvv_l ='" & eL.t_asvv_l & "'"
-'Sql &= "	,t_asvs_l ='" & eL.t_asvs_l & "'"
-'Sql &= "	,t_easv_l ='" & eL.t_easv_l & "'"
-'Sql &= "	,t_vasv_l ='" & eL.t_vasv_l & "'"
-'Sql &= "	,t_sasv_l ='" & eL.t_sasv_l & "'"
-'Sql &= "	,t_tave_l ='" & eL.t_tave_l & "'"
-'Sql &= "	,t_tavv_l ='" & eL.t_tavv_l & "'"
-'Sql &= "	,t_tavs_l ='" & eL.t_tavs_l & "'"
-'Sql &= "	,t_cosa   ='" & eL.t_cosa & "'"
-'Sql &= "	,t_lcos   ='" & eL.t_lcos & "'"
-'Sql &= "	,t_gsam   ='" & eL.t_gsam & "'"
-'Sql &= "	,t_nsam   ='" & eL.t_nsam & "'"
-'Sql &= "	,t_unit   ='" & eL.t_unit & "'"
-'Sql &= "	,t_unrt   ='" & eL.t_unrt & "'"
-'Sql &= "	,t_etyp   ='" & eL.t_etyp & "'"
-'Sql &= "	,t_levl   ='" & eL.t_levl & "'"
-'Sql &= "	,t_udst   ='" & eL.t_udst & "'"
-'Sql &= "	,t_item   ='" & eL.t_item & "'"
-'Sql &= "	,t_cequ   ='" & eL.t_cequ & "'"
-'Sql &= "	,t_desc   ='" & eL.t_desc & "'"
-'Sql &= "	,t_stat   ='" & eL.t_stat & "'"
-'Sql &= "	,t_isco   ='" & eL.t_isco & "'"
-'Sql &= "	,t_icos   ='" & eL.t_icos & "'"
-'Sql &= "	,t_isal   ='" & eL.t_isal & "'"
-'Sql &= "	,t_cspt   ='" & eL.t_cspt & "'"
-'Sql &= "	,t_scpf   ='" & eL.t_scpf & "'"
-'Sql &= "	,t_adjf   ='" & eL.t_adjf & "'"
-'Sql &= "	,t_norm   ='" & eL.t_norm & "'"
-'Sql &= "	,t_prat   ='" & eL.t_prat & "'"
-'Sql &= "	,t_clrt   ='" & eL.t_clrt & "'"
-'Sql &= "	,t_curr   ='" & eL.t_curr & "'"
-'Sql &= "	,t_dfpc   ='" & eL.t_dfpc & "'"
-'Sql &= "	,t_rtcc_1 ='" & eL.t_rtcc_1 & "'"
-'Sql &= "	,t_rtcc_2 ='" & eL.t_rtcc_2 & "'"
-'Sql &= "	,t_rtcc_3 ='" & eL.t_rtcc_3 & "'"
-'Sql &= "	,t_rtfc_1 ='" & eL.t_rtfc_1 & "'"
-'Sql &= "	,t_rtfc_2 ='" & eL.t_rtfc_2 & "'"
-'Sql &= "	,t_rtfc_3 ='" & eL.t_rtfc_3 & "'"
-'Sql &= "	,t_sper   ='" & eL.t_sper & "'"
-'Sql &= "	,t_sura   ='" & eL.t_sura & "'"
-'Sql &= "	,t_esca   ='" & eL.t_esca & "'"
-'Sql &= "	,t_cona   ='" & eL.t_cona & "'"
-'Sql &= "	,t_mper   ='" & eL.t_mper & "'"
-'Sql &= "	,t_mara   ='" & eL.t_mara & "'"
-'Sql &= "	,t_scur   ='" & eL.t_scur & "'"
-'Sql &= "	,t_fspr   ='" & eL.t_fspr & "'"
-'Sql &= "	,t_rtcs_1 ='" & eL.t_rtcs_1 & "'"
-'Sql &= "	,t_rtcs_2 ='" & eL.t_rtcs_2 & "'"
-'Sql &= "	,t_rtcs_3 ='" & eL.t_rtcs_3 & "'"
-'Sql &= "	,t_rtfs_1 ='" & eL.t_rtfs_1 & "'"
-'Sql &= "	,t_rtfs_2 ='" & eL.t_rtfs_2 & "'"
-'Sql &= "	,t_rtfs_3 ='" & eL.t_rtfs_3 & "'"
-'Sql &= "	,t_dper   ='" & eL.t_dper & "'"
-'Sql &= "	,t_disa   ='" & eL.t_disa & "'"
-'Sql &= "	,t_asta   ='" & eL.t_asta & "'"
-'Sql &= "	,t_astb   ='" & eL.t_astb & "'"
-'Sql &= "	,t_astc   ='" & eL.t_astc & "'"
-'Sql &= "	,t_astd   ='" & eL.t_astd & "'"
-'Sql &= "	,t_aste   ='" & eL.t_aste & "'"
-'Sql &= "	,t_astf   ='" & eL.t_astf & "'"
-'Sql &= "	,t_astg   ='" & eL.t_astg & "'"
-'Sql &= "	,t_ssel   ='" & eL.t_ssel & "'"
-'Sql &= "	,t_laun   ='" & eL.t_laun & "'"
-'Sql &= "	,t_cpva   ='" & eL.t_cpva & "'"
-'Sql &= "	,t_ocpr   ='" & eL.t_ocpr & "'"
-'Sql &= "	,t_ospr   ='" & eL.t_ospr & "'"
-'Sql &= "	,t_prim   ='" & eL.t_prim & "'"
-'Sql &= "	,t_exbc_1 ='" & eL.t_exbc_1 & "'"
-'Sql &= "	,t_exbc_2 ='" & eL.t_exbc_2 & "'"
-'Sql &= "	,t_exbc_3 ='" & eL.t_exbc_3 & "'"
-'Sql &= "	,t_exbs_1 ='" & eL.t_exbs_1 & "'"
-'Sql &= "	,t_exbs_2 ='" & eL.t_exbs_2 & "'"
-'Sql &= "	,t_exbs_3 ='" & eL.t_exbs_3 & "'"
-'Sql &= "	,t_cvat_l ='" & eL.t_cvat_l & "'"
-'Sql &= "	,t_cltx_l ='" & eL.t_cltx_l & "'"
-'Sql &= "	,t_extx_l ='" & eL.t_extx_l & "'"
-'Sql &= "	,t_stmt_l ='" & eL.t_stmt_l & "'"
-'Sql &= "	,t_cch1_l ='" & eL.t_cch1_l & "'"
-'Sql &= "	,t_ccp1_l ='" & eL.t_ccp1_l & "'"
-'Sql &= "	,t_cch2_l ='" & eL.t_cch2_l & "'"
-'Sql &= "	,t_ccp2_l ='" & eL.t_ccp2_l & "'"
-'Sql &= "	,t_cch3_l ='" & eL.t_cch3_l & "'"
-'Sql &= "	,t_ccp3_l ='" & eL.t_ccp3_l & "'"
-'Sql &= "	,t_cch4_l ='" & eL.t_cch4_l & "'"
-'Sql &= "	,t_ccp4_l ='" & eL.t_ccp4_l & "'"
-'Sql &= "	,t_octr_l ='" & eL.t_octr_l & "'"
-'Sql &= "	,t_ocpr_l ='" & eL.t_ocpr_l & "'"
-'Sql &= "	,t_otbp   ='" & eL.t_otbp & "'"
-'Sql &= "	,t_txta   ='" & eL.t_txta & "'"
-'Sql &= "  ,t_Refcntd ='" & eL.t_Refcntd & "'"
-'Sql &= "  ,t_Refcntu ='" & eL.t_Refcntu & "'"

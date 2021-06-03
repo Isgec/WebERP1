@@ -43,6 +43,7 @@ Namespace SIS.ERP
     End Function
     <DataObjectMethod(DataObjectMethodType.Select)> _
     Public Shared Function BaaNDCRDetailSelectList(ByVal DCRNo As String) As List(Of SIS.ERP.erpDCRDetail)
+      Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
       Dim mSql As String = ""
       mSql = mSql & "select distinct "
       mSql = mSql & "dcrd.t_dcrn as DCRNo,"
@@ -65,19 +66,19 @@ Namespace SIS.ERP
       mSql = mSql & "emp3.t_nama as BuyerIDinPOName,"
       mSql = mSql & "bpe3.t_mail as BuyerIDinPOEMail, "
       mSql = mSql & "bp01.t_nama as SupplierName "
-      mSql = mSql & "from tdmisg115200 as dcrd "
-      mSql = mSql & "left outer join ttdisg003200 as reqc on (dcrd.t_docd = reqc.t_docn and dcrd.t_revn = reqc.t_revi) "
-      mSql = mSql & "left outer join ttdpur201200 as reql on (reqc.t_rqno = reql.t_rqno and reqc.t_pono = reql.t_pono) "
-      mSql = mSql & "left outer join ttdpur200200 as reqh on (reql.t_rqno = reqh.t_rqno) "
-      mSql = mSql & "left outer join ttdpur202200 as reqp on (reqc.t_rqno = reqp.t_rqno and reqc.t_pono = reqp.t_pono ) "
-      mSql = mSql & "left outer join ttdpur400200 as ordh on (reqp.t_prno = ordh.t_orno ) "
-      mSql = mSql & "left outer join ttccom001200 as emp1 on reqh.t_remn=emp1.t_emno "
-      mSql = mSql & "left outer join tbpmdm001200 as bpe1 on reqh.t_remn=bpe1.t_emno "
-      mSql = mSql & "left outer join ttccom001200 as emp2 on reqh.t_ccon=emp2.t_emno "
-      mSql = mSql & "left outer join tbpmdm001200 as bpe2 on reqh.t_ccon=bpe2.t_emno "
-      mSql = mSql & "left outer join ttccom001200 as emp3 on ordh.t_ccon=emp3.t_emno "
-      mSql = mSql & "left outer join tbpmdm001200 as bpe3 on ordh.t_ccon=bpe3.t_emno "
-      mSql = mSql & "left outer join ttccom100200 as bp01 on ordh.t_otbp=bp01.t_bpid "
+      mSql = mSql & "from tdmisg115" & Comp & " as dcrd "
+      mSql = mSql & "left outer join ttdisg003" & Comp & " as reqc on (dcrd.t_docd = reqc.t_docn and dcrd.t_revn = reqc.t_revi) "
+      mSql = mSql & "left outer join ttdpur201" & Comp & " as reql on (reqc.t_rqno = reql.t_rqno and reqc.t_pono = reql.t_pono) "
+      mSql = mSql & "left outer join ttdpur200" & Comp & " as reqh on (reql.t_rqno = reqh.t_rqno) "
+      mSql = mSql & "left outer join ttdpur202" & Comp & " as reqp on (reqc.t_rqno = reqp.t_rqno and reqc.t_pono = reqp.t_pono ) "
+      mSql = mSql & "left outer join ttdpur400" & Comp & " as ordh on (reqp.t_prno = ordh.t_orno ) "
+      mSql = mSql & "left outer join ttccom001" & Comp & " as emp1 on reqh.t_remn=emp1.t_emno "
+      mSql = mSql & "left outer join tbpmdm001" & Comp & " as bpe1 on reqh.t_remn=bpe1.t_emno "
+      mSql = mSql & "left outer join ttccom001" & Comp & " as emp2 on reqh.t_ccon=emp2.t_emno "
+      mSql = mSql & "left outer join tbpmdm001" & Comp & " as bpe2 on reqh.t_ccon=bpe2.t_emno "
+      mSql = mSql & "left outer join ttccom001" & Comp & " as emp3 on ordh.t_ccon=emp3.t_emno "
+      mSql = mSql & "left outer join tbpmdm001" & Comp & " as bpe3 on ordh.t_ccon=bpe3.t_emno "
+      mSql = mSql & "left outer join ttccom100" & Comp & " as bp01 on ordh.t_otbp=bp01.t_bpid "
       mSql = mSql & "where dcrd.t_dcrn = '" & DCRNo & "'"
 
       Dim Results As List(Of SIS.ERP.erpDCRDetail) = Nothing

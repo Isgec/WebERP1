@@ -72,12 +72,13 @@ Namespace SIS.VR
       Return _Result
     End Function
     Private Shared Function GetProjectCompany(ByVal ProjectID As String) As String
+      Dim comp As String = HttpContext.Current.Session("FinanceCompany")
       Dim mRet As String = ""
       Dim Sql As String = ""
       Sql = " Select "
       Sql &= " t_ncmp As Company "
       Sql &= " ,t_rsac As Activity "
-      Sql &= " From ttppdm600200 "
+      Sql &= " From ttppdm600" & comp
       Sql &= " Where t_cprj = '" & ProjectID & "'"
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString)
         Using Cmd As SqlCommand = Con.CreateCommand()
@@ -95,8 +96,8 @@ Namespace SIS.VR
 
     Public Shared Function PaymentInBaaNByIRNo(ByVal IRNo As String, ByVal ProjectID As String) As List(Of SIS.VR.VchData)
       Dim Results As List(Of SIS.VR.VchData) = Nothing
-      Dim comp As String = "200"
-      comp = GetProjectCompany(ProjectID)
+      Dim prjcomp As String = GetProjectCompany(ProjectID)
+      Dim comp As String = HttpContext.Current.Session("FinanceCompany")
       Dim Sql As String = ""
       Sql = Sql & "  select "
       Sql = Sql & "    ir.t_ninv as IRNo,"
@@ -118,14 +119,14 @@ Namespace SIS.VR
       Sql = Sql & "    (case when cq.t_drec ='' then 0 else 1 end) as Freezed, "
       Sql = Sql & "    bt.t_user as ProcessedBy,"
       Sql = Sql & "    bt.t_date as ProcessedOn, "
-      Sql = Sql & "    isnull((select sum(t_amth_1) from ttfgld102200 where t_cono='" & comp & "' and t_ttyp=ir.t_ctyp and t_docn=ir.t_cinv and t_dbcr=2 ),0) as gld102Amth,"
-      Sql = Sql & "    isnull((select top 1 t_dcdt from ttfgld102200 where t_cono='" & comp & "' and t_ttyp=ir.t_ctyp and t_docn=ir.t_cinv and t_dbcr=2 ),'') as gld102Date,"
-      Sql = Sql & "    isnull((select sum(t_amth_1) from ttfgld106" & comp & " where t_otyp=ir.t_ctyp and t_odoc=ir.t_cinv and t_dbcr=2 ),0) as gld106Amth,"
-      Sql = Sql & "    isnull((select top 1 t_dcdt from ttfgld106" & comp & " where t_otyp=ir.t_ctyp and t_odoc=ir.t_cinv and t_dbcr=2 ),'') as gld106Date "
-      Sql = Sql & "  from ttfacp100200 as ir "
-      Sql = Sql & "    left outer join ttfcmg101200 as pb on (ir.t_ctyp = pb.t_ttyp and ir.t_cinv = pb.t_ninv and pb.t_comp='" & comp & "' and t_tadv=1)  "
-      Sql = Sql & "    left outer join ttfcmg100200 as cq on pb.t_btno = cq.t_pbtn "
-      Sql = Sql & "    left outer join ttfcmg109200 as bt on pb.t_btno = bt.t_btno "
+      Sql = Sql & "    isnull((select sum(t_amth_1) from ttfgld102200 where t_cono='" & prjcomp & "' and t_ttyp=ir.t_ctyp and t_docn=ir.t_cinv and t_dbcr=2 ),0) as gld102Amth,"
+      Sql = Sql & "    isnull((select top 1 t_dcdt from ttfgld102200 where t_cono='" & prjcomp & "' and t_ttyp=ir.t_ctyp and t_docn=ir.t_cinv and t_dbcr=2 ),'') as gld102Date,"
+      Sql = Sql & "    isnull((select sum(t_amth_1) from ttfgld106" & prjcomp & " where t_otyp=ir.t_ctyp and t_odoc=ir.t_cinv and t_dbcr=2 ),0) as gld106Amth,"
+      Sql = Sql & "    isnull((select top 1 t_dcdt from ttfgld106" & prjcomp & " where t_otyp=ir.t_ctyp and t_odoc=ir.t_cinv and t_dbcr=2 ),'') as gld106Date "
+      Sql = Sql & "  from ttfacp100" & comp & " as ir "
+      Sql = Sql & "    left outer join ttfcmg101" & comp & " as pb on (ir.t_ctyp = pb.t_ttyp and ir.t_cinv = pb.t_ninv and pb.t_comp='" & prjcomp & "' and t_tadv=1)  "
+      Sql = Sql & "    left outer join ttfcmg100" & comp & " as cq on pb.t_btno = cq.t_pbtn "
+      Sql = Sql & "    left outer join ttfcmg109" & comp & " as bt on pb.t_btno = bt.t_btno "
       Sql = Sql & "  where ir.t_ctyp = 'PTR' and ir.t_ninv = " & IRNo
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()

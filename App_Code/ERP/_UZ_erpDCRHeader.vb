@@ -43,6 +43,7 @@ Namespace SIS.ERP
     End Function
     <DataObjectMethod(DataObjectMethodType.Select)> _
     Public Shared Function BaaNDCRHeaderSelectList(ByVal DCRNo As String) As SIS.ERP.erpDCRHeader
+      Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
       Dim mSql As String = ""
       mSql = mSql & "select "
       mSql = mSql & "dcrh.t_dcrn as DCRNo,"
@@ -53,10 +54,10 @@ Namespace SIS.ERP
       mSql = mSql & "emp1.t_nama as CreatedName,"
       mSql = mSql & "bpe1.t_mail as CreatedEMail,"
       mSql = mSql & "adr1.t_nama as ProjectDescription "
-      mSql = mSql & "from tdmisg114200 dcrh "
-      mSql = mSql & "left outer join ttccom001200 as emp1 on dcrh.t_crea=emp1.t_emno "
-      mSql = mSql & "left outer join tbpmdm001200 as bpe1 on dcrh.t_crea=bpe1.t_emno "
-      mSql = mSql & "left outer join ttccom130200 as adr1 on dcrh.t_cprj=adr1.t_cadr "
+      mSql = mSql & "from tdmisg114" & Comp & " dcrh "
+      mSql = mSql & "left outer join ttccom001" & Comp & " as emp1 on dcrh.t_crea=emp1.t_emno "
+      mSql = mSql & "left outer join tbpmdm001" & Comp & " as bpe1 on dcrh.t_crea=bpe1.t_emno "
+      mSql = mSql & "left outer join ttccom130" & Comp & " as adr1 on dcrh.t_cprj=adr1.t_cadr "
       mSql = mSql & "where dcrh.t_dcrn = '" & DCRNo & "'"
       Dim Results As SIS.ERP.erpDCRHeader = Nothing
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())

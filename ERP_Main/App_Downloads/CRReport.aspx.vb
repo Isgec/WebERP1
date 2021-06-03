@@ -23,8 +23,8 @@ Partial Class CRReport
 		Dim FilePath As String = CreateFile(FromDate, ToDate)
 		HttpContext.Current.Server.ScriptTimeout = mLastScriptTimeout
 		Response.ClearContent()
-		Response.AppendHeader("content-disposition", "attachment; filename=" & DWFile & ".xlsx" & """")
-		Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(IO.Path.GetFileName(FilePath))
+    Response.AppendHeader("content-disposition", "attachment; filename=""" & DWFile & ".xlsx" & """")
+    Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(IO.Path.GetFileName(FilePath))
 		Response.WriteFile(FilePath)
 		Response.End()
 	End Sub
@@ -78,16 +78,17 @@ Partial Class CRReport
 				Catch ex As Exception
 					.Cells(r, 11).Value = ""
 				End Try
-				Select Case doc.StatusID
-					Case 7, 8, 9
-						.Cells(r, 12).Value = doc.ERP_RequestStatus5_Description
-						.Cells(r, 13).Value = ""
-					Case Else
-						.Cells(r, 12).Value = ""
-						.Cells(r, 13).Value = doc.ERP_RequestStatus5_Description
-				End Select
-				r += 1
-			Next
+        Select Case doc.StatusID
+          Case 7, 8, 9
+            .Cells(r, 12).Value = doc.ERP_RequestStatus5_Description
+            .Cells(r, 13).Value = ""
+          Case Else
+            .Cells(r, 12).Value = ""
+            .Cells(r, 13).Value = doc.ERP_RequestStatus5_Description
+        End Select
+        .Cells(r, 14).Value = SIS.ERP.erpApplications.erpApplicationsGetByID(doc.ApplID).ApplName
+        r += 1
+      Next
 		End With
 
 
@@ -152,9 +153,9 @@ Public Class ReportClass
 		Sql &= "  INNER JOIN [ERP_RequestTypes] AS [ERP_RequestTypes6]"
 		Sql &= "    ON [ERP_ChaneRequest].[RequestTypeID] = [ERP_RequestTypes6].[RequestTypeID]"
 		Sql &= "  WHERE"
-		Sql &= "  [ERP_ChaneRequest].[ApplID] = 1"
-		Sql &= "  AND ([ERP_ChaneRequest].[RequestID] >= " & FromDate & "AND [ERP_ChaneRequest].[RequestID] <= " & ToDate & ")"
-		Sql &= "  ORDER BY [ERP_ChaneRequest].[RequestID]"
+    'Sql &= "  [ERP_ChaneRequest].[ApplID] = 1"
+    Sql &= "   ([ERP_ChaneRequest].[RequestID] >= " & FromDate & "AND [ERP_ChaneRequest].[RequestID] <= " & ToDate & ")"
+    Sql &= "  ORDER BY [ERP_ChaneRequest].[RequestID]"
 
 		Return GetReportClass(Sql)
 	End Function

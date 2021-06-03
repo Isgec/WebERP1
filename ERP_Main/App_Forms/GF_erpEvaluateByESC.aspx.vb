@@ -414,8 +414,9 @@ Partial Class GF_erpEvaluateByESC
   Public Shared Function validate_FK_ERP_ChaneRequest_ApplID(ByVal value As String) As String
     Dim aVal() As String = value.Split(",".ToCharArray)
     Dim mRet As String="0|" & aVal(0)
-		Dim ApplID As Int32 = CType(aVal(1),Int32)
-		Dim oVar As SIS.ERP.erpApplications = SIS.ERP.erpApplications.erpApplicationsGetByID(ApplID)
+    If aVal(1) = "" Then aVal(1) = 0
+    Dim ApplID As Int32 = CType(aVal(1), Int32)
+    Dim oVar As SIS.ERP.erpApplications = SIS.ERP.erpApplications.erpApplicationsGetByID(ApplID)
     If oVar Is Nothing Then
 			mRet = "1|" & aVal(0) & "|Record not found." 
     Else

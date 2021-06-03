@@ -9,36 +9,6 @@ Namespace SIS.QCM
     Private Shared _RecordCount As Integer
     Private _ProjectID As String = ""
     Private _Description As String = ""
-    Public ReadOnly Property ForeColor() As System.Drawing.Color
-      Get
-        Dim mRet As System.Drawing.Color = Drawing.Color.Blue
-        Try
-					mRet = GetColor()
-        Catch ex As Exception
-        End Try
-        Return mRet
-      End Get
-    End Property
-    Public ReadOnly Property Visible() As Boolean
-      Get
-        Dim mRet As Boolean = True
-        Try
-					mRet = GetVisible()
-        Catch ex As Exception
-        End Try
-        Return mRet
-      End Get
-    End Property
-    Public ReadOnly Property Enable() As Boolean
-      Get
-        Dim mRet As Boolean = True
-        Try
-					mRet = GetEnable()
-        Catch ex As Exception
-        End Try
-        Return mRet
-      End Get
-    End Property
     Public Property ProjectID() As String
       Get
         Return _ProjectID

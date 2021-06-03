@@ -59,6 +59,9 @@
           <asp:Image ID="any" runat="server" AlternateText="logo" CssClass="sis_header" ImageUrl="~/App_Themes/Default/Images/headernew.jpg" />
         </td>
         <td class="loginTd">
+          <div class="nt-but-warning" style="float:left;padding:22px;">
+            <asp:Label ID="LblCompanyName" runat="server" Font-Bold="true" Font-Size="16px" ForeColor="#ffffff"></asp:Label>
+          </div>
           <LGM:LoginLine ID="LoginLine1" runat="server" />
         </td>
       </tr>

@@ -18,36 +18,6 @@ Namespace SIS.QCM
     Private _Address4 As String = ""
     Private _ToEMailID As String = ""
     Private _CCEmailID As String = ""
-    Public ReadOnly Property ForeColor() As System.Drawing.Color
-      Get
-        Dim mRet As System.Drawing.Color = Drawing.Color.Blue
-        Try
-					mRet = GetColor()
-        Catch ex As Exception
-        End Try
-        Return mRet
-      End Get
-    End Property
-    Public ReadOnly Property Visible() As Boolean
-      Get
-        Dim mRet As Boolean = True
-        Try
-					mRet = GetVisible()
-        Catch ex As Exception
-        End Try
-        Return mRet
-      End Get
-    End Property
-    Public ReadOnly Property Enable() As Boolean
-      Get
-        Dim mRet As Boolean = True
-        Try
-					mRet = GetEnable()
-        Catch ex As Exception
-        End Try
-        Return mRet
-      End Get
-    End Property
     Public Property VendorID() As String
       Get
         Return _VendorID

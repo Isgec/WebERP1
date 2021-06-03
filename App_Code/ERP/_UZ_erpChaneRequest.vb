@@ -167,7 +167,7 @@ Namespace SIS.ERP
           Next
           oMsg.CC.Add(New MailAddress(oRq.FK_ERP_ChaneRequest_RequestedBy.EMailID, oRq.FK_ERP_ChaneRequest_RequestedBy.UserFullName))
           oMsg.CC.Add(New MailAddress(oRq.FK_ERP_ChaneRequest_ApprovedBy.EMailID, oRq.FK_ERP_ChaneRequest_ApprovedBy.UserFullName))
-          oMsg.Subject = "Evalustion By IT -ERP Change Request #" & oRq.RequestID
+          oMsg.Subject = "Evaluation By IT -ERP Change Request #" & oRq.RequestID
         Case "4" 'Reject By IT
           Dim LoginUser As SIS.QCM.qcmUsers = SIS.QCM.qcmUsers.qcmUsersGetByID(HttpContext.Current.Session("LoginID"))
           oMsg.From = New MailAddress(LoginUser.EMailID, LoginUser.UserFullName)
@@ -278,7 +278,7 @@ Namespace SIS.ERP
       oRow = New TableRow
       oCol = New TableCell
       oCol.ColumnSpan = "5"
-      oCol.Text = "IT Business Application Change Request Form"
+      oCol.Text = "IT Business Application/Infra Change Request Form"
       oCol.Style.Add("text-align", "center")
       oCol.Style.Add("border-bottom", "none")
       oCol.Font.Size = "16"

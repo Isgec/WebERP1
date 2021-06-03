@@ -18,8 +18,8 @@ Partial Class filedownload
 			Dim oFl As SIS.ERP.erpRequestAttachments = SIS.ERP.erpRequestAttachments.erpRequestAttachmentsGetByID(docPK, filePK, FileType)
 			If IO.File.Exists(oFl.DiskFile) Then
 				Response.Clear()
-				Response.AppendHeader("content-disposition", "attachment; filename=" & oFl.FileName & """")
-				Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(oFl.FileName)
+        Response.AppendHeader("content-disposition", "attachment; filename=" & oFl.FileName)
+        Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(oFl.FileName)
 				Response.WriteFile(oFl.DiskFile)
 				Response.End()
 			End If

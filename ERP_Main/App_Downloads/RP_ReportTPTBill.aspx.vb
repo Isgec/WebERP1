@@ -28,8 +28,8 @@ Partial Class RP_ReportTPTBill
 		HttpContext.Current.Server.ScriptTimeout = mLastScriptTimeout
 		'===============
 		Response.ClearContent()
-		Response.AppendHeader("content-disposition", "attachment; filename=" & DWFile & ".xlsx" & """")
-		Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(IO.Path.GetFileName(FilePath))
+    Response.AppendHeader("content-disposition", "attachment; filename=" & DWFile & ".xlsx")
+    Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(IO.Path.GetFileName(FilePath))
 		Response.WriteFile(FilePath)
 		Response.End()
 	End Sub
