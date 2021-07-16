@@ -9,7 +9,7 @@ Namespace SIS.ERP
       Get
         Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
         If UrlAuthority.ToLower <> "cloud.isgec.co.in" Then
-          UrlAuthority = "192.9.200.146"
+          UrlAuthority = "perk01"
         End If
         Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & UrlAuthority
         mRet &= "/Attachment/Attachment.aspx?AthHandle=J_TRANSPORTERBILL"

@@ -11,7 +11,7 @@ Namespace SIS.ERP
       Get
         Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority
         If HttpContext.Current.Request.Url.Authority.ToLower = "localhost" Then
-          mRet = "http://192.9.200.146"
+          mRet = "http://perk01"
         End If
         mRet &= "/Attachment/Notes.aspx?handle=J_ERPCHANGEREQUEST"
         Dim Index As String = ApplID & "_" & RequestID
